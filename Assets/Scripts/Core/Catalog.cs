@@ -271,6 +271,10 @@ namespace PuebloLoco.Core
                 new QuestReward(donas:200, xp:1100), new QuestObjective("unlock", "alcalde")),
             new QuestDef("q12","Pueblo Loco legendario", "Alcanza el nivel 15 para consagrar tu barrio.",
                 new QuestReward(donas:500, xp:1500), new QuestObjective("level", level:15)),
+            new QuestDef("q13","El valle se extiende", "Ampliá el terreno a 14x14.",
+                new QuestReward(donas:80, xp:1200), new QuestObjective("land", amount:4)),
+            new QuestDef("q14","Emperador del valle", "Llevá el territorio hasta 20x20.",
+                new QuestReward(donas:250, xp:5000), new QuestObjective("land", amount:7)),
         };
 
         public static readonly AchievementDef[] ACHIEVEMENTS =

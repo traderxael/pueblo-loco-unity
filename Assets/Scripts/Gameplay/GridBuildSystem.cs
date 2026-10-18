@@ -131,6 +131,61 @@ namespace PuebloLoco.Gameplay
             return gx >= 0 && gy >= 0 && gx < size && gy < size;
         }
 
+        // ------------------------------------------------------------------
+        // entorno del valle: montañas de fondo, río y puente
+        // ------------------------------------------------------------------
+        Transform envRoot;
+        int envTier = -1;
+
+        void BuildEnvironment(int tier)
+        {
+            if (envRoot != null && envTier == tier) return;
+            if (envRoot != null) Destroy(envRoot.gameObject);
+            envTier = tier;
+
+            int size = Catalog.LAND_TIERS[tier].size;
+            envRoot = new GameObject("Environment").transform;
+            envRoot.SetParent(transform, false);
+
+            var mountain = Resources.Load<GameObject>("China/SM_Env_Mountain");
+            if (mountain != null)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    float a = i * Mathf.PI * 2f / 12f;
+                    float r = size * 0.75f + 26f;
+                    var pivot = new GameObject("MountainPivot").transform;
+                    pivot.SetParent(envRoot, false);
+                    pivot.position = new Vector3(Mathf.Cos(a) * r, -2.2f, Mathf.Sin(a) * r);
+                    pivot.rotation = Quaternion.Euler(0f, -a * Mathf.Rad2Deg + 90f, 0f);
+                    var m = Instantiate(mountain, pivot);
+                    m.transform.localPosition = Vector3.zero;
+                    m.transform.localScale = Vector3.one * (1.3f + (i % 3) * 0.35f);
+                }
+            }
+
+            var river = Resources.Load<GameObject>("China/SM_Env_River");
+            if (river != null)
+            {
+                float z = size * 0.5f + 6.5f;
+                for (int i = -3; i <= 3; i++)
+                {
+                    var w = Instantiate(river, envRoot);
+                    w.transform.localPosition = new Vector3(i * 8f, -0.30f, z);
+                }
+                var bridge = Resources.Load<GameObject>("China/SM_Env_Bridge");
+                if (bridge != null)
+                {
+                    var pivot = new GameObject("BridgePivot").transform;
+                    pivot.SetParent(envRoot, false);
+                    pivot.position = new Vector3(0f, -0.22f, z);
+                    pivot.rotation = Quaternion.Euler(0f, 90f, 0f);
+                    var b = Instantiate(bridge, pivot);
+                    b.transform.localPosition = Vector3.zero;
+                }
+            }
+        }
+
         public void RebuildAll()
         {
             if (tileRoot == null || buildingRoot == null) return;
@@ -140,6 +195,7 @@ namespace PuebloLoco.Gameplay
             placedViews.Clear();
 
             var s = GameManager.Instance.State;
+            BuildEnvironment(s.landTier);
             int size = Catalog.LAND_TIERS[s.landTier].size;
 
             // tiles
@@ -201,7 +257,7 @@ namespace PuebloLoco.Gameplay
                     decor.transform.localScale = new Vector3(0.3f, 0.25f, 0.3f);
                     decor.transform.SetParent(buildingRoot);
                     ColorUtility.TryParseHtmlString(def.color, out var c);
-                    decor.GetComponent<Renderer>().material.color = c;
+                    ApplyFlat(decor, c);
                     decor.name = $"Decor_{d.id}";
                 }
             }
@@ -216,8 +272,25 @@ namespace PuebloLoco.Gameplay
         }
 
         // ------------------------------------------------------------------
-        // materiales: colores + texturas CC0 (Poly Haven) para China
+        // materiales: URP/Lit + colores + texturas CC0 (Poly Haven)
         // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Shader del pipeline activo. Se pide desde Resources/URPLit.mat y no
+        /// directo con Shader.Find("Universal Render Pipeline/Lit") porque un
+        /// Shader.Find en runtime no garantiza que el shader llegue al build:
+        /// sin ningun asset que lo referencie, Unity lo strippea y todo sale
+        /// magenta en el ejecutable aunque se vea bien en el editor.
+        /// </summary>
+        public static Shader LitShader()
+        {
+            var mat = Resources.Load<Material>("URPLit");
+            if (mat != null && mat.shader != null) return mat.shader;
+            var s = Shader.Find("Universal Render Pipeline/Lit");
+            if (s != null) return s;
+            return Shader.Find("Standard");
+        }
+
         static readonly Dictionary<string, Texture2D> texCache = new Dictionary<string, Texture2D>();
 
         static Texture2D Tex(string name)
@@ -250,10 +323,10 @@ namespace PuebloLoco.Gameplay
             }
         }
 
-        /// <summary>Material Standard: con textura si el nombre lo indica, si no color plano.</summary>
+        /// <summary>Material URP/Lit: con textura si el nombre lo indica, si no color plano.</summary>
         Material MakeMaterial(string name, Color tint)
         {
-            var m = new Material(Shader.Find("Standard"));
+            var m = new Material(LitShader());
             m.name = name;
             TexFor(name, out var diff, out var norm, out var tiling);
             if (diff != null)
@@ -278,8 +351,17 @@ namespace PuebloLoco.Gameplay
                 m.SetColor("_EmissionColor", new Color(1f, 0.42f, 0.10f) * 2.2f);
                 m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             }
-            m.SetFloat("_Glossiness", 0.12f);
+            SetSmoothness(m, 0.12f);
             return m;
+        }
+
+        /// <summary>El Standard de Built-in llama a esta propiedad _Glossiness y
+        /// URP/Lit la llama _Smoothness. Como el codigo tiene fallback a Built-in,
+        /// se escribe la que exista en el shader activo.</summary>
+        public static void SetSmoothness(Material m, float value)
+        {
+            if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", value);
+            else if (m.HasProperty("_Glossiness")) m.SetFloat("_Glossiness", value);
         }
 
         /// <summary>Pinta el edificio con los colores del catálogo y la paleta china.</summary>
@@ -370,8 +452,22 @@ namespace PuebloLoco.Gameplay
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.transform.localScale = new Vector3(0.8f, 1.2f, 0.8f);
             ColorUtility.TryParseHtmlString(def.color, out var c);
-            go.GetComponent<Renderer>().material.color = c;
+            ApplyFlat(go, c);
             return go;
+        }
+
+        /// <summary>CreatePrimitive asigna el material por defecto del proyecto
+        /// (Standard de Built-in). Con URP activo eso se dibuja magenta, asi que
+        /// hay que reemplazar el material por uno del pipeline actual.</summary>
+        static void ApplyFlat(GameObject go, Color color)
+        {
+            foreach (var r in go.GetComponentsInChildren<Renderer>())
+            {
+                var m = new Material(LitShader());
+                m.color = color;
+                SetSmoothness(m, 0.1f);
+                r.sharedMaterial = m;
+            }
         }
 
         /* ------------------------------------------------ modo colocación */
@@ -429,22 +525,39 @@ namespace PuebloLoco.Gameplay
                 CancelPlacing();
         }
 
-        /// <summary>En el shader Standard, poner solo "_Mode" no alcanza: hay que
-        /// cambiar el blend y el ZWrite y habilitar el keyword, o el fantasma queda opaco.</summary>
+        /// <summary>
+        /// Poner solo "_Mode" no alcanza en ninguno de los dos pipelines. Built-in
+        /// usa _Mode/_SrcBlend/_DstBlend/_ZWrite con el keyword _ALPHABLEND_ON;
+        /// URP/Lit en cambio usa _Surface (0 opaco, 1 transparente) con el keyword
+        /// _SURFACE_TYPE_TRANSPARENT. Hay que cubrir los dos, porque el fallback a
+        /// Built-in sigue activo.
+        /// </summary>
         void SetGhostAlpha(GameObject go, float a)
         {
             foreach (var r in go.GetComponentsInChildren<Renderer>())
             {
                 var m = r.material;
-                m.SetFloat("_Mode", 3);
                 m.SetOverrideTag("RenderType", "Transparent");
-                m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                m.SetInt("_ZWrite", 0);
-                m.DisableKeyword("_ALPHATEST_ON");
-                m.EnableKeyword("_ALPHABLEND_ON");
-                m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
                 m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
+                if (m.HasProperty("_Surface"))
+                {
+                    m.SetFloat("_Surface", 1f); // URP/Lit
+                    m.DisableKeyword("_ALPHATEST_ON");
+                    m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                    m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                }
+                else
+                {
+                    m.SetFloat("_Mode", 3); // Standard de Built-in
+                    m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    m.SetInt("_ZWrite", 0);
+                    m.DisableKeyword("_ALPHATEST_ON");
+                    m.EnableKeyword("_ALPHABLEND_ON");
+                    m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                }
+
                 var c = m.color; c.a = a; m.color = c;
             }
         }

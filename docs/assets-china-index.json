@@ -1,5 +1,5 @@
 {
-  "asset_count": 17,
+  "asset_count": 20,
   "units": "metros (1 u = 1 m)",
   "axis": "Blender Z-up, frente -Y; FBX export Forward -Z / Up Y",
   "palette": {
@@ -219,6 +219,33 @@
         "Work"
       ],
       "kind": "character"
+    },
+    {
+      "name": "SM_Env_River",
+      "file": "SM_Env_River.fbx",
+      "tris": 384,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "env"
+    },
+    {
+      "name": "SM_Env_Bridge",
+      "file": "SM_Env_Bridge.fbx",
+      "tris": 408,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "env"
+    },
+    {
+      "name": "SM_Env_Mountain",
+      "file": "SM_Env_Mountain.fbx",
+      "tris": 316,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "env"
     }
   ]
 }

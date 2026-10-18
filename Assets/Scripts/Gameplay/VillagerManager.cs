@@ -177,10 +177,10 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("trim") || n.Contains("gold")) c = new Color(0.85f, 0.65f, 0.18f);
                     else continue;
 
-                    var m = new Material(Shader.Find("Standard"));
+                    var m = new Material(GridBuildSystem.LitShader());
                     m.name = mats[i].name;
                     m.color = c;
-                    m.SetFloat("_Glossiness", 0.15f);
+                    GridBuildSystem.SetSmoothness(m, 0.15f);
                     m.SetFloat("_Metallic", 0f);
                     mats[i] = m;
                     changed = true;

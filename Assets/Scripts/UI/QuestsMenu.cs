@@ -204,6 +204,7 @@ namespace PuebloLoco.UI
             "tasksDone" => $"Completa {o.amount} tareas",
             "buildings" => $"Ten {o.amount} edificios",
             "decor" => $"Coloca {o.amount} adornos",
+            "land" => $"Amplía el terreno a {Catalog.LAND_TIERS[Mathf.Clamp(o.amount, 0, Catalog.LAND_TIERS.Length - 1)].size}x{Catalog.LAND_TIERS[Mathf.Clamp(o.amount, 0, Catalog.LAND_TIERS.Length - 1)].size}",
             _ => o.type
         };
     }

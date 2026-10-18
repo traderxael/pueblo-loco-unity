@@ -469,6 +469,7 @@ namespace PuebloLoco.Core
             "tasksDone" => s.stats.tasksDone >= o.amount,
             "buildings" => s.buildings.Count >= o.amount,
             "decor" => s.decor.Count >= o.amount,
+            "land" => s.landTier >= o.amount,
             _ => false
         };
 

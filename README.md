@@ -180,6 +180,31 @@ Se amplió la progresión de terreno de 4 a **8 niveles** (de 6×6 a 20×20):
 
 ![Detalle del territorio](docs/china6-detalle.png)
 
+### Río, puente y montañas (v6)
+
+Generado con `Tools/Blender/build_china_assets_v4.py`:
+
+| Asset | Uso |
+|---|---|
+| `SM_Env_River` | Segmento de río de 8x8 m con orillas de piedra, juncos y rocas |
+| `SM_Env_Bridge` | Puente de arco de piedra con barandas rojas |
+| `SM_Env_Mountain` | Grupo de montañas low-poly con nieve para el fondo |
+
+- `GridBuildSystem.BuildEnvironment` arma el entorno por código: **12 montañas en anillo**
+  alrededor del valle, **7 segmentos de río** al norte y el **puente** cruzándolo.
+- El entorno **se regenera al ampliar el terreno** (el anillo se aleja según el tamaño).
+- **Misiones nuevas** con objetivo `land`: q13 "El valle se extiende" (14x14) y
+  q14 "Emperador del valle" (20x20).
+- El proyecto ahora corre sobre **URP**; los materiales usan el shader URP Lit con
+  fallback y `Assets/Resources/URPLit.mat` evita que el shader se stripea en el build.
+
+![Valle con río y montañas](docs/china7-valle.png)
+
+| Río | Puente | Montañas |
+|---|---|---|
+| ![Río](docs/china7-rio.png) | ![Puente](docs/china7-puente.png) | ![Montañas](docs/china7-montana.png) |
+
+![Detalle](docs/china7-detalle.png)
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que
