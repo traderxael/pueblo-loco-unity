@@ -163,6 +163,21 @@ namespace PuebloLoco.Dev
                 VillagerManager.Instance.forceAll = true;
                 VillagerManager.Instance.Sync();
             }
+            var es = Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>();
+            var botones = Object.FindObjectsByType<UnityEngine.UI.Button>(FindObjectsSortMode.None);
+            Debug.Log("[UI] eventSystem=" + (es != null) + " modulo=" + (es != null && es.currentInputModule != null) + " botones=" + botones.Length);
+            foreach (var b in botones)
+            {
+                if (b.name.ToLowerInvariant().Contains("skip")) { b.onClick.Invoke(); Debug.Log("[UI] click saltar tutorial OK"); break; }
+            }
+            foreach (var b in botones)
+            {
+                if (b.name.ToLowerInvariant().Contains("build")) { b.onClick.Invoke(); Debug.Log("[UI] click construir OK"); break; }
+            }
+            var bm = Object.FindAnyObjectByType<PuebloLoco.UI.BuildMenu>();
+            bool bmVisible = false;
+            if (bm != null) { foreach (Transform c in bm.transform) if (c.name.ToLowerInvariant().Contains("panel")) bmVisible = c.gameObject.activeSelf; }
+            Debug.Log("[UI] buildMenuVisible=" + bmVisible);
             var tutorial = PuebloLoco.UI.TutorialManager.Instance;
             if (tutorial != null) tutorial.EndTutorial(true);
 

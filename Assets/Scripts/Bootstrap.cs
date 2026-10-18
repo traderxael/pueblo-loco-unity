@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using PuebloLoco.Gameplay;
@@ -16,8 +17,24 @@ namespace PuebloLoco
             go.AddComponent<Bootstrap>();
         }
 
+        /// <summary>
+        /// Sin EventSystem ningún botón de la UI responde (construir, saltar tutorial, etc.).
+        /// La escena no lo trae y Bootstrap crea toda la UI por código, así que se
+        /// asegura acá. activeInputHandler = 0 usa el Input Manager clásico.
+        /// </summary>
+        static void EnsureEventSystem()
+        {
+            if (Object.FindAnyObjectByType<EventSystem>() != null) return;
+            var go = new GameObject("EventSystem");
+            go.AddComponent<EventSystem>();
+            go.AddComponent<StandaloneInputModule>();
+            Object.DontDestroyOnLoad(go);
+        }
+
         void Awake()
         {
+            EnsureEventSystem();
+
             // GameManager
             if (GameManager.Instance == null)
                 new GameObject("GameManager").AddComponent<GameManager>();
