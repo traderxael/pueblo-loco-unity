@@ -68,10 +68,10 @@ namespace PuebloLoco.Dev
                 if (iso != null)
                 {
                     Vector3 focus = GridBuildSystem.Instance != null
-                        ? GridBuildSystem.Instance.GridToWorld(3, 4)
+                        ? GridBuildSystem.Instance.GridToWorld(6, 7)
                         : new Vector3(0f, 0f, 0f);
                     iso.FocusOn(focus);
-                    iso.SetDistance(6.8f);
+                    iso.SetDistance(7.5f);
                     yield return new WaitForSecondsRealtime(1.4f);
                     yield return StartCoroutine(Snap("06_closeup"));
                 }
@@ -102,16 +102,16 @@ namespace PuebloLoco.Dev
             var s = gm.State;
             s.coins = 250000;
             s.level = 12;
-            s.landTier = 2; // terreno 10x10
+            s.landTier = 7; // terreno 20x20
             foreach (var c in s.characters) c.unlocked = true;
 
             s.buildings.Clear();
             var layout = new[]
             {
-                ("casa", 0, 0), ("kiosco", 2, 1), ("panaderia", 4, 0),
-                ("casahan", 1, 2), ("pagoda", 3, 3), ("mercado", 0, 5),
-                ("templo", 4, 5), ("muralla", 6, 2), ("herreria", 6, 0),
-                ("granja", 2, 6), ("posada", 6, 5), ("campanario", 0, 3)
+                ("casa", 2, 2), ("kiosco", 4, 3), ("panaderia", 6, 2),
+                ("casahan", 3, 4), ("campanario", 2, 5), ("pagoda", 6, 6),
+                ("mercado", 2, 8), ("templo", 8, 8), ("muralla", 10, 4),
+                ("herreria", 10, 2), ("granja", 4, 10), ("posada", 10, 10)
             };
             foreach (var l in layout)
             {
@@ -173,7 +173,7 @@ namespace PuebloLoco.Dev
                 if (iso != null)
                 {
                     iso.FocusOn(new Vector3(0f, 0f, 0f));
-                    iso.SetDistance(13.5f);
+                    iso.SetDistance(29f);
                 }
             }            Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);
         }

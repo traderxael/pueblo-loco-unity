@@ -239,6 +239,10 @@ namespace PuebloLoco.Core
             new LandTier(8,  2000),
             new LandTier(10, 25000),
             new LandTier(12, 300000),
+            new LandTier(14, 1800000),
+            new LandTier(16, 7000000),
+            new LandTier(18, 25000000),
+            new LandTier(20, 80000000),
         };
 
         public static readonly QuestDef[] QUESTS =
@@ -280,6 +284,8 @@ namespace PuebloLoco.Core
             new AchievementDef("rich",          "Caja fuerte",           "Ten 100.000 monedas a la vez",  20, s => s.coins >= 100000),
             new AchievementDef("dona-hoarder",  "Coleccionista de donas","Acumula 200 donas",             0,  s => s.donas >= 200),
             new AchievementDef("expander",      "Visionario",            "Expande el terreno a 10x10",    15, s => s.landTier >= 2),
+            new AchievementDef("land-14",       "Conquistador",          "Expande el terreno a 14x14",    40, s => s.landTier >= 4),
+            new AchievementDef("land-20",       "Emperador del valle",   "Expande el terreno a 20x20",   150, s => s.landTier >= 7),
             new AchievementDef("decorator",     "Paisajista",            "Coloca 6 adornos",              20, s => s.decor.Count >= 6),
             new AchievementDef("metropolis",    "Metrópolis",            "Ten 20 edificios en pie",       40, s => s.buildings.Count >= 20),
             new AchievementDef("all-quests",    "Alcalde honorario",     "Completa las 12 misiones",      100,s => s.questIndex >= QUESTS.Length),

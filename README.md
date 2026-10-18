@@ -154,6 +154,32 @@ Generado con `Tools/Blender/build_china_assets_v3.py` (reutiliza los helpers de 
 
 ![Detalle en el juego](docs/china5-detalle.png)
 
+### Más territorio (v5): el valle crece
+
+Se amplió la progresión de terreno de 4 a **8 niveles** (de 6×6 a 20×20):
+
+| Nivel | Tamaño | Costo |
+|---|---|---|
+| 0 | 6×6 | gratis |
+| 1 | 8×8 | 2.000 |
+| 2 | 10×10 | 25.000 |
+| 3 | 12×12 | 300.000 |
+| 4 | **14×14** | 1.800.000 |
+| 5 | **16×16** | 7.000.000 |
+| 6 | **18×18** | 25.000.000 |
+| 7 | **20×20** | 80.000.000 |
+
+- **Logros nuevos**: "Conquistador" (14×14, 40 donas) y "Emperador del valle" (20×20, 150 donas).
+- **Cámara**: el zoom máximo ahora es dinámico (`size * 1.3 + 5`, hasta ~31 m) para poder ver
+  todo el valle; antes estaba fijo en 15 m y no se veía el mapa grande.
+- Los árboles del borde, el paseo de los vecinos y la colocación de edificios ya escalaban con
+  el tamaño del terreno, así que funcionan solos con los niveles nuevos.
+- El botón del HUD muestra automáticamente el próximo tamaño y costo, y "Terreno máximo" al llegar al final.
+
+![Territorio 20x20](docs/china6-territorio.png)
+
+![Detalle del territorio](docs/china6-detalle.png)
+
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que

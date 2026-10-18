@@ -9,6 +9,14 @@ namespace PuebloLoco.Gameplay
         public float zoomSpeed = 2f;
         public float minZoom = 4f;
         public float maxZoom = 15f;
+
+        /// <summary>Zoom máximo dinámico: el terreno crece hasta 20x20.</summary>
+        float MaxZoom()
+        {
+            var gm = Gameplay.GameManager.Instance;
+            int size = (gm != null && gm.State != null) ? Core.Catalog.LAND_TIERS[gm.State.landTier].size : 8;
+            return Mathf.Max(maxZoom, size * 1.30f + 5f);
+        }
         public float angleX = 50f;
         public float angleY = 45f;
 
@@ -43,7 +51,7 @@ namespace PuebloLoco.Gameplay
             // Zoom: rueda del ratón
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (Mathf.Abs(scroll) > 0.01f)
-                distance = Mathf.Clamp(distance - scroll * zoomSpeed * 5f, minZoom, maxZoom);
+                distance = Mathf.Clamp(distance - scroll * zoomSpeed * 5f, minZoom, MaxZoom());
 
             // Touch pan (móvil)
             if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
@@ -62,7 +70,7 @@ namespace PuebloLoco.Gameplay
             {
                 float currDist = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
                 if (pinchPrev > 0f)
-                    distance = Mathf.Clamp(distance - (currDist - pinchPrev) * 0.01f * zoomSpeed, minZoom, maxZoom);
+                    distance = Mathf.Clamp(distance - (currDist - pinchPrev) * 0.01f * zoomSpeed, minZoom, MaxZoom());
                 pinchPrev = currDist;
             }
             else
@@ -88,7 +96,7 @@ namespace PuebloLoco.Gameplay
 
         public void SetDistance(float d)
         {
-            distance = Mathf.Clamp(d, minZoom, maxZoom);
+            distance = Mathf.Clamp(d, minZoom, MaxZoom());
         }
 
         /// <summary>Impide dejar la cámara fuera del terreno.</summary>
