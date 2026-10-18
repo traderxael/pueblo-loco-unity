@@ -33,30 +33,50 @@ caminan solos por el pueblo y varias correcciones de render del proyecto origina
 ### Tema "China antigua" (Canva → Blender → Unity)
 
 A partir de la presentación sobre las dinastías Xia, Shang y Zhou hecha en **Canva**
-(carpeta `pueblo loco`), se modelaron assets nuevos en Blender y se integraron al juego:
+(carpeta `pueblo loco`), se modelaron los assets en Blender y se integraron al juego.
 
-- **5 assets nuevos** generados por script (`Tools/Blender/build_china_assets.py`):
-  `CasaHan` (casa con techo curvo), `Pagoda` (tres cuerpos), `Ding` (vasija ritual de bronce),
-  `FarolHan` (farol rojo) y `Puerta` (paifang).
-- **2 personajes nuevos riggeados**: **Sabio Chen** (túnica, rodete y barba) y **Guardia Wu**
-  (armadura, casco y lanza que se mueve con la mano), con **20 huesos y las 5 animaciones**
-  (`Idle`, `Walk`, `Run`, `Work`, `Wave`).
-- **Edificios nuevos** en el catálogo: **Casa Han** (900 monedas) y **Pagoda del Dragón** (6000).
-- **Vecinos nuevos desbloqueables** con tareas propias: "Estudiar los clásicos",
+**Rediseño v2** (siguiendo el prompt maestro de ciudad china, estilo Tang/Ming):
+
+- Paleta del prompt: rojo laca `#B33B2E`, dorado `#D9A441`, verde jade `#3E7C59`,
+  madera oscura `#4A3728`, techo azul-gris `#37474F` y blanco cal `#EDE6D6`.
+- **Techos** con perfil curvo, aleros levantados, tabla de alero, caballete y remates.
+- **Dougong** (ménsulas entrelazadas) bajo cada alero.
+- **Celosías geométricas** en puertas y ventanas, studs dorados, farolillos,
+  banderolas y **leones guardianes** en la entrada.
+- **Pagoda de 5 pisos** con balcones, barandas, pináculo de aros dorados y farolillos.
+- **Paifang** (puerta ceremonial) con tres techos y banderolas.
+- Assets con nomenclatura **SM_/SK_** e `index.json` con tris, huesos y animaciones
+  (`docs/assets-china-index.json`).
+
+| Casa Han | Pagoda 5 pisos | Paifang |
+|---|---|---|
+| ![Casa Han](docs/china2-casahan.png) | ![Pagoda](docs/china2-pagoda.png) | ![Paifang](docs/china2-paifang.png) |
+
+| Vasija ding | Farol | Sabio Chen | Guardia Wu |
+|---|---|---|---|
+| ![Ding](docs/china2-ding.png) | ![Farol](docs/china2-farol.png) | ![Sabio](docs/china2-sabio.png) | ![Guardia](docs/china2-guardia.png) |
+
+**Personajes** (`SK_Sabio`, `SK_Guardia`):
+
+- **22 huesos con nombres del rig Humanoid de Unity** (`Hips`, `Spine`, `Chest`,
+  `Head`, `LeftUpperArm`, `LeftLowerLeg`, `LeftToes`, ...), listos para mapear a
+  avatar Humanoid.
+- **8 animaciones** cada uno: `Idle`, `Walk`, `Run`, `Work`, `Wave`, `Bow`, `Cheer`, `Gather`.
+- Sabio: túnica en capas, solapas cruzadas, faja con jade, rodete con pasador y barba.
+- Guardia: armadura lamelar, hombreras, casco con cresta, grebas y lanza con moharra y borla.
+
+**Integración en el juego**
+
+- Edificios nuevos: **Casa Han** (900) y **Pagoda del Dragón** (6000); el paifang está
+  disponible como asset para futuras puertas de distrito.
+- Vecinos nuevos desbloqueables con tareas propias: "Estudiar los clásicos",
   "Meditar en el jardín", "Patrullar el pueblo" y "Entrenar con la lanza".
-- **Decoración**: faroles y vasijas de bronce como adornos colocables.
-- Las partidas viejas **migran solas**: `SaveSystem.EnsureCharacters` agrega los personajes
-  nuevos al guardado existente.
+- Decoración: faroles y vasijas de bronce colocables.
+- Las partidas viejas **migran solas** (`SaveSystem.EnsureCharacters`).
 
-![Aldea con tema chino](docs/china-pueblo.png)
+![Aldea con tema chino](docs/china-pueblo2.png)
 
-| Casa Han | Pagoda | Vasija de bronce |
-|---|---|---|
-| ![Casa Han](docs/china-casahan.png) | ![Pagoda](docs/china-pagoda.png) | ![Ding](docs/china-ding.png) |
-
-| Sabio Chen | Guardia Wu | Detalle en el juego |
-|---|---|---|
-| ![Sabio](docs/china-sabio.png) | ![Guardia](docs/china-guardia.png) | ![Detalle](docs/china-detalle.png) |
+![Detalle en el juego](docs/china-detalle2.png)
 
 ### Correcciones del proyecto original
 

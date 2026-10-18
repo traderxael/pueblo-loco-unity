@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using UnityEngine;
 using PuebloLoco.Core;
@@ -7,7 +7,7 @@ using PuebloLoco.Gameplay;
 namespace PuebloLoco.Dev
 {
     /// <summary>
-    /// Modo captura para verificar el juego sin interacción:
+    /// Modo captura para verificar el juego sin interacciÃ³n:
     /// arma un pueblo de ejemplo, deja a los vecinos animados y guarda PNGs.
     /// Uso: PuebloLoco.exe -shotdir "ruta"
     /// </summary>
@@ -71,7 +71,7 @@ namespace PuebloLoco.Dev
                         ? GridBuildSystem.Instance.GridToWorld(3, 4)
                         : new Vector3(0f, 0f, 0f);
                     iso.FocusOn(focus);
-                    iso.SetDistance(3.6f);
+                    iso.SetDistance(6.8f);
                     yield return new WaitForSecondsRealtime(1.4f);
                     yield return StartCoroutine(Snap("06_closeup"));
                 }
@@ -109,8 +109,8 @@ namespace PuebloLoco.Dev
             var layout = new[]
             {
                 ("casa", 0, 0), ("kiosco", 2, 1), ("panaderia", 4, 0),
-                ("casahan", 1, 2), ("pagoda", 3, 3), ("floreria", 0, 5),
-                ("cafeteria", 5, 5), ("casa", 2, 6)
+                ("casahan", 1, 2), ("pagoda", 3, 3), ("casahan", 0, 5),
+                ("casahan", 5, 5), ("casa", 2, 6)
             };
             foreach (var l in layout)
             {
@@ -169,10 +169,12 @@ namespace PuebloLoco.Dev
                 if (iso != null)
                 {
                     iso.FocusOn(new Vector3(0f, 0f, 0f));
-                    iso.SetDistance(9.5f);
+                    iso.SetDistance(11.5f);
                 }
             }
             Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);
         }
     }
 }
+
+

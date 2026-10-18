@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -44,7 +44,7 @@ namespace PuebloLoco.EditorTools
 
     public static class CharacterPipeline
     {
-        static readonly string[] Models = { "Villager", "Kid", "Elder", "Sabio", "Guardia" };
+        static readonly string[] Models = { "Villager", "Kid", "Elder", "SK_Sabio", "SK_Guardia" };
 
         [MenuItem("Pueblo Loco/1. Importar personajes y crear Animators")]
         public static void BuildControllers()
@@ -249,3 +249,4 @@ namespace PuebloLoco.EditorTools
         }
     }
 }
+

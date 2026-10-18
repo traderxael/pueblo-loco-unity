@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using PuebloLoco.Core;
 
@@ -8,7 +8,7 @@ namespace PuebloLoco.Gameplay
     {
         public static GridBuildSystem Instance { get; private set; }
 
-        [Header("Prefabs (se cargan de Resources si están vacíos)")]
+        [Header("Prefabs (se cargan de Resources si estÃ¡n vacÃ­os)")]
         public GameObject grassTilePrefab;
         public GameObject pathTilePrefab;
         public GameObject treePrefab;
@@ -20,7 +20,7 @@ namespace PuebloLoco.Gameplay
         Transform buildingRoot;
         readonly Dictionary<string, GameObject> placedViews = new Dictionary<string, GameObject>();
 
-        // modo colocación
+        // modo colocaciÃ³n
         string placingDef;
         GameObject ghost;
         bool placing;
@@ -45,7 +45,7 @@ namespace PuebloLoco.Gameplay
             if (pathTilePrefab == null) pathTilePrefab = Resources.Load<GameObject>("PathTile");
             if (treePrefab == null) treePrefab = Resources.Load<GameObject>("Tree");
 
-            // OJO: los FBX en Resources empiezan con mayúscula (Casa.fbx).
+            // OJO: los FBX en Resources empiezan con mayÃºscula (Casa.fbx).
             var map = new Dictionary<string, string>
             {
                 { "casa", "Casa" },
@@ -59,11 +59,11 @@ namespace PuebloLoco.Gameplay
                 else Debug.LogWarning("[BUILDING] falta Resources/" + kv.Value + ".fbx");
             }
 
-            // edificios y adornos temáticos de la China antigua
+            // edificios y adornos temÃ¡ticos de la China antigua
             var chinaBuildings = new Dictionary<string, string>
             {
-                { "casahan", "China/CasaHan" },
-                { "pagoda", "China/Pagoda" },
+                { "casahan", "China/SM_Building_CasaHan" },
+                { "pagoda", "China/SM_Building_Pagoda_05" },
             };
             foreach (var kv in chinaBuildings)
             {
@@ -74,8 +74,8 @@ namespace PuebloLoco.Gameplay
 
             var decorMap = new Dictionary<string, string>
             {
-                { "farol", "China/FarolHan" },
-                { "estatua", "China/Ding" },
+                { "farol", "China/SM_Prop_Lantern" },
+                { "estatua", "China/SM_Prop_Ding" },
             };
             foreach (var kv in decorMap)
             {
@@ -118,13 +118,13 @@ namespace PuebloLoco.Gameplay
                 {
                     var prefab = grassTilePrefab;
                     if (prefab == null) continue;
-                    // OJO: conservar la rotación del prefab (los FBX vienen con -90° en X)
+                    // OJO: conservar la rotaciÃ³n del prefab (los FBX vienen con -90Â° en X)
                     var go = Instantiate(prefab, tileRoot);
                     go.transform.localPosition = GridToWorld(x, y);
                     go.name = $"Tile_{x}_{y}";
                 }
 
-            // árboles decorativos en bordes
+            // Ã¡rboles decorativos en bordes
             if (treePrefab != null)
             {
                 for (int i = 0; i < size; i += 2)
@@ -150,7 +150,7 @@ namespace PuebloLoco.Gameplay
                 placedViews[b.id] = go;
             }
 
-            // adornos temáticos
+            // adornos temÃ¡ticos
             foreach (var d in s.decor)
             {
                 var def = Catalog.Decor(d.def);
@@ -160,6 +160,7 @@ namespace PuebloLoco.Gameplay
                 {
                     decor = Instantiate(dp, buildingRoot);
                     decor.transform.localPosition = pos;
+                    decor.transform.localScale = Vector3.one * (d.def == "farol" ? 0.62f : 0.8f);
                     decor.name = $"Decor_{d.id}";
                     ApplyPalette(decor, null, null);
                 }
@@ -184,7 +185,7 @@ namespace PuebloLoco.Gameplay
             go.transform.localScale = Vector3.one * 0.8f;
         }
 
-        /// <summary>Pinta el edificio con los colores del catálogo y la paleta china.</summary>
+        /// <summary>Pinta el edificio con los colores del catÃ¡logo y la paleta china.</summary>
         void TintBuilding(GameObject go, BuildingDef def)
         {
             Color wall, roof;
@@ -255,8 +256,8 @@ namespace PuebloLoco.Gameplay
         {
             switch (def)
             {
-                case "pagoda": return 0.30f;
-                case "casahan": return 0.72f;
+                case "pagoda": return 0.19f;
+                case "casahan": return 0.45f;
                 default: return 1f;
             }
         }
@@ -270,7 +271,7 @@ namespace PuebloLoco.Gameplay
             return go;
         }
 
-        /* ------------------------------------------------ modo colocación */
+        /* ------------------------------------------------ modo colocaciÃ³n */
 
         public void BeginPlacing(string defId)
         {
@@ -332,4 +333,7 @@ namespace PuebloLoco.Gameplay
         }
     }
 }
+
+
+
 

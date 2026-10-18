@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using PuebloLoco.Core;
 
@@ -7,7 +7,7 @@ namespace PuebloLoco.Gameplay
     /// <summary>
     /// Crea y mantiene un vecino animado por cada personaje desbloqueado.
     /// Usa los modelos con esqueleto generados en Blender (Villager/Kid/Elder)
-    /// y les pinta la ropa/pelo según el catálogo.
+    /// y les pinta la ropa/pelo segÃºn el catÃ¡logo.
     /// </summary>
     public class VillagerManager : MonoBehaviour
     {
@@ -73,8 +73,8 @@ namespace PuebloLoco.Gameplay
             {
                 case "nina": modelName = "Kid"; scale = 0.44f; break;
                 case "ramon": modelName = "Elder"; scale = 0.50f; break;
-                case "sabio": modelName = "Sabio"; scale = 0.55f; break;
-                case "guardia": modelName = "Guardia"; scale = 0.56f; break;
+                case "sabio": modelName = "SK_Sabio"; scale = 0.55f; break;
+                case "guardia": modelName = "SK_Guardia"; scale = 0.56f; break;
                 default: modelName = "Villager"; scale = 0.55f; break;
             }
 
@@ -180,3 +180,4 @@ namespace PuebloLoco.Gameplay
         }
     }
 }
+

@@ -1,0 +1,106 @@
+{
+  "asset_count": 7,
+  "units": "metros (1 u = 1 m)",
+  "axis": "Blender Z-up, frente -Y; FBX export Forward -Z / Up Y",
+  "palette": {
+    "rojo_laca": "#B33B2E",
+    "dorado": "#D9A441",
+    "verde_jade": "#3E7C59",
+    "madera_oscura": "#4A3728",
+    "techo_azul_gris": "#37474F",
+    "blanco_cal": "#EDE6D6"
+  },
+  "assets": [
+    {
+      "name": "SM_Building_CasaHan",
+      "file": "SM_Building_CasaHan.fbx",
+      "tris": 1626,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Building_Pagoda_05",
+      "file": "SM_Building_Pagoda_05.fbx",
+      "tris": 3322,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Building_Paifang",
+      "file": "SM_Building_Paifang.fbx",
+      "tris": 1318,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Prop_Ding",
+      "file": "SM_Prop_Ding.fbx",
+      "tris": 592,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "prop"
+    },
+    {
+      "name": "SM_Prop_Lantern",
+      "file": "SM_Prop_Lantern.fbx",
+      "tris": 308,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "prop"
+    },
+    {
+      "name": "SK_Sabio",
+      "file": "SK_Sabio.fbx",
+      "tris": 1120,
+      "bones": 22,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work",
+        "Wave",
+        "Bow",
+        "Cheer",
+        "Gather"
+      ],
+      "loops": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "SK_Guardia",
+      "file": "SK_Guardia.fbx",
+      "tris": 1036,
+      "bones": 22,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work",
+        "Wave",
+        "Bow",
+        "Cheer",
+        "Gather"
+      ],
+      "loops": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work"
+      ],
+      "kind": "character"
+    }
+  ]
+}

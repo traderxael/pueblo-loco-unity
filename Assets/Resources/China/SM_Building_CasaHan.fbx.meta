@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6c41b2f442714de4a8f3ad1a3d277709
+guid: 2d7720096e79e8946ad929a9ba936137
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
@@ -23,7 +23,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 0
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -43,9 +43,9 @@ ModelImporter:
     preBakeTriangleCollisionMesh: 0
     importPhysicalCameras: 1
     importVisibility: 1
-    importBlendShapes: 0
-    importCameras: 0
-    importLights: 0
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
