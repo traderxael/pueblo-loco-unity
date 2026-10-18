@@ -18,6 +18,7 @@ namespace PuebloLoco.Dev
         {
             var args = System.Environment.GetCommandLineArgs();
             if (System.Array.IndexOf(args, "-shotdir") < 0) return;
+            Application.runInBackground = true;
             var go = new GameObject("DevCapture");
             DontDestroyOnLoad(go);
             go.AddComponent<DevCapture>();
@@ -57,6 +58,25 @@ namespace PuebloLoco.Dev
                 }
             }
 
+            yield return new WaitForSecondsRealtime(0.3f);
+
+            // toma de acercamiento a la pagoda y los vecinos
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                var iso = cam.GetComponent<IsometricCamera>();
+                if (iso != null)
+                {
+                    Vector3 focus = GridBuildSystem.Instance != null
+                        ? GridBuildSystem.Instance.GridToWorld(3, 4)
+                        : new Vector3(0f, 0f, 0f);
+                    iso.FocusOn(focus);
+                    iso.SetDistance(3.6f);
+                    yield return new WaitForSecondsRealtime(1.4f);
+                    yield return StartCoroutine(Snap("06_closeup"));
+                }
+            }
+
             Debug.Log("[CAPTURE] fin");
             Application.Quit();
         }
@@ -70,7 +90,7 @@ namespace PuebloLoco.Dev
                 File.WriteAllBytes(Path.Combine(Dir, name + ".png"), tex.EncodeToPNG());
                 Destroy(tex);
             }
-            Debug.Log("[CAPTURE] " + name);
+            Debug.Log("[CAPTURE] " + name + " ok=" + (tex != null));
             yield return null;
         }
 
@@ -88,8 +108,9 @@ namespace PuebloLoco.Dev
             s.buildings.Clear();
             var layout = new[]
             {
-                ("casa", 2, 2), ("kiosco", 5, 2), ("panaderia", 3, 5),
-                ("casa", 6, 6), ("floreria", 1, 6), ("cafeteria", 6, 1)
+                ("casa", 0, 0), ("kiosco", 2, 1), ("panaderia", 4, 0),
+                ("casahan", 1, 2), ("pagoda", 3, 3), ("floreria", 0, 5),
+                ("cafeteria", 5, 5), ("casa", 2, 6)
             };
             foreach (var l in layout)
             {
@@ -104,12 +125,32 @@ namespace PuebloLoco.Dev
                 });
             }
 
+            s.decor.Clear();
+            var decor = new[]
+            {
+                ("farol", 1, 5), ("farol", 7, 2), ("estatua", 0, 3), ("estatua", 7, 7)
+            };
+            foreach (var d in decor)
+            {
+                s.decor.Add(new PlacedDecor
+                {
+                    id = GameState.NextId(),
+                    def = d.Item1,
+                    x = d.Item2,
+                    y = d.Item3
+                });
+            }
+
             var luis = s.characters.Find(c => c.def == "luis");
             if (luis != null) luis.task = new ActiveTask { taskId = "regar", endAt = gm.NowMs + 300000, done = false };
             var carmen = s.characters.Find(c => c.def == "carmen");
             if (carmen != null) carmen.task = new ActiveTask { taskId = "hornear", endAt = gm.NowMs + 300000, done = false };
             var nina = s.characters.Find(c => c.def == "nina");
             if (nina != null) nina.task = new ActiveTask { taskId = "jugar", endAt = gm.NowMs + 300000, done = false };
+            var sabio = s.characters.Find(c => c.def == "sabio");
+            if (sabio != null) sabio.task = new ActiveTask { taskId = "estudiar", endAt = gm.NowMs + 300000, done = false };
+            var guardia = s.characters.Find(c => c.def == "guardia");
+            if (guardia != null) guardia.task = new ActiveTask { taskId = "patrullar", endAt = gm.NowMs + 300000, done = false };
 
             gm.NotifyChanged();
             if (GridBuildSystem.Instance != null) GridBuildSystem.Instance.RebuildAll();
@@ -128,7 +169,7 @@ namespace PuebloLoco.Dev
                 if (iso != null)
                 {
                     iso.FocusOn(new Vector3(0f, 0f, 0f));
-                    iso.SetDistance(6.2f);
+                    iso.SetDistance(9.5f);
                 }
             }
             Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);

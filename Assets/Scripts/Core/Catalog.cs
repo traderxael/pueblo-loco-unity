@@ -165,8 +165,10 @@ namespace PuebloLoco.Core
             new BuildingDef("floreria",  "Florería",          1200,  1, 90,   34,   25,  2,  "#a8e6a1", "#27ae60", "shop"),
             new BuildingDef("panaderia", "Panadería",         600,   2, 120,  48,   35,  2,  "#f0b27a", "#d35400", "shop"),
             new BuildingDef("taller",    "Taller Mecánico",   3000,  2, 240,  98,   50,  3,  "#95a5a6", "#5d6d7e", "garage"),
+            new BuildingDef("casahan",   "Casa Han",          900,   1, 75,   30,   30,  3,  "#d9b382", "#5d4037", "house"),
             new BuildingDef("cafeteria", "Cafetería",         7500,  2, 300,  165,  65,  4,  "#d7bde2", "#7d3c98", "shop"),
             new BuildingDef("cine",      "Cine del Barrio",   18000, 2, 480,  330,  90,  5,  "#f1948a", "#943126", "cinema"),
+            new BuildingDef("pagoda",    "Pagoda del Dragón", 6000,  2, 300,  210,  80,  6,  "#b03a2e", "#1e8449", "temple"),
             new BuildingDef("escuela",   "Escuela",           35000, 2, 600,  520,  120, 6,  "#f9e79f", "#b7950b", "school"),
             new BuildingDef("hospital",  "Hospital",          80000, 3, 720,  960,  180, 8,  "#ffffff", "#c0392b", "hospital"),
             new BuildingDef("comisaria", "Comisaría",         150000,2, 900,  1500, 250, 10, "#aed6f1", "#1a5276", "office"),
@@ -201,6 +203,12 @@ namespace PuebloLoco.Core
             new CharacterDef("alcalde","Alcalde Vera",50,"#c0392b", "#bdc3c7",
                 new TaskDef("discurso","Discurso en la plaza",  10800, 3500, 500),
                 new TaskDef("parque",  "Inaugurar el parque",   43200, 12000,1200)),
+            new CharacterDef("sabio",  "Sabio Chen", 20, "#8e44ad", "#ecf0f1",
+                new TaskDef("estudiar","Estudiar los clásicos",  1800,  320,  70),
+                new TaskDef("meditar", "Meditar en el jardín",   900,   160,  40)),
+            new CharacterDef("guardia","Guardia Wu", 25, "#b9770e", "#17202a",
+                new TaskDef("patrullar","Patrullar el pueblo",   1200,  260,  55),
+                new TaskDef("entrenar", "Entrenar con la lanza", 2400,  520,  100)),
         };
 
         public static readonly DecorDef[] DECOR =

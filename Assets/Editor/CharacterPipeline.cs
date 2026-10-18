@@ -44,7 +44,7 @@ namespace PuebloLoco.EditorTools
 
     public static class CharacterPipeline
     {
-        static readonly string[] Models = { "Villager", "Kid", "Elder" };
+        static readonly string[] Models = { "Villager", "Kid", "Elder", "Sabio", "Guardia" };
 
         [MenuItem("Pueblo Loco/1. Importar personajes y crear Animators")]
         public static void BuildControllers()

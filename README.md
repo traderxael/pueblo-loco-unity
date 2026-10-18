@@ -30,6 +30,34 @@ caminan solos por el pueblo y varias correcciones de render del proyecto origina
 - **Animator Controllers** generados por editor script con parámetros `Speed`, `Working` y
   `Wave` y transiciones Idle/Walk/Run/Work/Wave.
 
+### Tema "China antigua" (Canva → Blender → Unity)
+
+A partir de la presentación sobre las dinastías Xia, Shang y Zhou hecha en **Canva**
+(carpeta `pueblo loco`), se modelaron assets nuevos en Blender y se integraron al juego:
+
+- **5 assets nuevos** generados por script (`Tools/Blender/build_china_assets.py`):
+  `CasaHan` (casa con techo curvo), `Pagoda` (tres cuerpos), `Ding` (vasija ritual de bronce),
+  `FarolHan` (farol rojo) y `Puerta` (paifang).
+- **2 personajes nuevos riggeados**: **Sabio Chen** (túnica, rodete y barba) y **Guardia Wu**
+  (armadura, casco y lanza que se mueve con la mano), con **20 huesos y las 5 animaciones**
+  (`Idle`, `Walk`, `Run`, `Work`, `Wave`).
+- **Edificios nuevos** en el catálogo: **Casa Han** (900 monedas) y **Pagoda del Dragón** (6000).
+- **Vecinos nuevos desbloqueables** con tareas propias: "Estudiar los clásicos",
+  "Meditar en el jardín", "Patrullar el pueblo" y "Entrenar con la lanza".
+- **Decoración**: faroles y vasijas de bronce como adornos colocables.
+- Las partidas viejas **migran solas**: `SaveSystem.EnsureCharacters` agrega los personajes
+  nuevos al guardado existente.
+
+![Aldea con tema chino](docs/china-pueblo.png)
+
+| Casa Han | Pagoda | Vasija de bronce |
+|---|---|---|
+| ![Casa Han](docs/china-casahan.png) | ![Pagoda](docs/china-pagoda.png) | ![Ding](docs/china-ding.png) |
+
+| Sabio Chen | Guardia Wu | Detalle en el juego |
+|---|---|---|
+| ![Sabio](docs/china-sabio.png) | ![Guardia](docs/china-guardia.png) | ![Detalle](docs/china-detalle.png) |
+
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que

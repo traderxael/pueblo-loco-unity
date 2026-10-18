@@ -1,0 +1,14 @@
+# Los binarios no se normalizan (evita que git los marque modificados)
+*.fbx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.pptx binary
+*.pdf binary
+*.blend binary
+*.wav binary
+*.mp3 binary
+*.dll binary
+*.exe binary

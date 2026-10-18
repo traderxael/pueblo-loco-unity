@@ -67,8 +67,16 @@ namespace PuebloLoco.Gameplay
             var def = Catalog.Character(defId);
             if (def == null) return null;
 
-            string modelName = defId == "nina" ? "Kid" : (defId == "ramon" ? "Elder" : "Villager");
-            float scale = defId == "nina" ? 0.44f : (defId == "ramon" ? 0.50f : 0.55f);
+            string modelName;
+            float scale;
+            switch (defId)
+            {
+                case "nina": modelName = "Kid"; scale = 0.44f; break;
+                case "ramon": modelName = "Elder"; scale = 0.50f; break;
+                case "sabio": modelName = "Sabio"; scale = 0.55f; break;
+                case "guardia": modelName = "Guardia"; scale = 0.56f; break;
+                default: modelName = "Villager"; scale = 0.55f; break;
+            }
 
             var go = new GameObject("Villager_" + defId);
             go.transform.SetParent(transform, false);
@@ -145,10 +153,12 @@ namespace PuebloLoco.Gameplay
                     string n = mats[i].name.ToLowerInvariant();
                     Color c;
                     if (n.Contains("skin")) c = skin;
-                    else if (n.Contains("shirt")) c = shirt;
-                    else if (n.Contains("pants")) c = pants;
+                    else if (n.Contains("shirt") || n.Contains("robe")) c = shirt;
+                    else if (n.Contains("pants") || n.Contains("trousers")) c = pants;
                     else if (n.Contains("hair")) c = hair;
-                    else if (n.Contains("shoes")) c = shoes;
+                    else if (n.Contains("shoes") || n.Contains("boots")) c = shoes;
+                    else if (n.Contains("armor")) c = Color.Lerp(shirt, new Color(0.32f, 0.22f, 0.06f), 0.45f);
+                    else if (n.Contains("trim") || n.Contains("gold")) c = new Color(0.85f, 0.65f, 0.18f);
                     else continue;
 
                     var m = new Material(Shader.Find("Standard"));

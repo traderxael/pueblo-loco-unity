@@ -13,6 +13,7 @@ namespace PuebloLoco.Gameplay
         public GameObject pathTilePrefab;
         public GameObject treePrefab;
         public Dictionary<string, GameObject> buildingPrefabs = new Dictionary<string, GameObject>();
+        public Dictionary<string, GameObject> decorPrefabs = new Dictionary<string, GameObject>();
 
         const float TILE = 1f;
         Transform tileRoot;
@@ -56,6 +57,31 @@ namespace PuebloLoco.Gameplay
                 var prefab = Resources.Load<GameObject>(kv.Value);
                 if (prefab != null) buildingPrefabs[kv.Key] = prefab;
                 else Debug.LogWarning("[BUILDING] falta Resources/" + kv.Value + ".fbx");
+            }
+
+            // edificios y adornos temáticos de la China antigua
+            var chinaBuildings = new Dictionary<string, string>
+            {
+                { "casahan", "China/CasaHan" },
+                { "pagoda", "China/Pagoda" },
+            };
+            foreach (var kv in chinaBuildings)
+            {
+                var prefab = Resources.Load<GameObject>(kv.Value);
+                if (prefab != null) buildingPrefabs[kv.Key] = prefab;
+                else Debug.LogWarning("[BUILDING] falta Resources/" + kv.Value + ".fbx");
+            }
+
+            var decorMap = new Dictionary<string, string>
+            {
+                { "farol", "China/FarolHan" },
+                { "estatua", "China/Ding" },
+            };
+            foreach (var kv in decorMap)
+            {
+                var prefab = Resources.Load<GameObject>(kv.Value);
+                if (prefab != null) decorPrefabs[kv.Key] = prefab;
+                else Debug.LogWarning("[DECOR] falta Resources/" + kv.Value + ".fbx");
             }
         }
 
@@ -116,7 +142,7 @@ namespace PuebloLoco.Gameplay
                 var go = Instantiate(prefab, buildingRoot);
                 go.transform.localPosition = GridToWorld(b.x, b.y);
                 go.name = $"Building_{b.id}";
-                go.transform.localScale = Vector3.one * def.size;
+                go.transform.localScale = Vector3.one * (def.size * VisualScale(def.def));
                 TintBuilding(go, def);
                 var view = go.AddComponent<BuildingView>();
                 view.buildingId = b.id;
@@ -124,17 +150,29 @@ namespace PuebloLoco.Gameplay
                 placedViews[b.id] = go;
             }
 
-            // adornos (fallback cubes)
+            // adornos temáticos
             foreach (var d in s.decor)
             {
                 var def = Catalog.Decor(d.def);
-                var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                go.transform.position = GridToWorld(d.x, d.y) + Vector3.up * 0.25f;
-                go.transform.localScale = new Vector3(0.3f, 0.25f, 0.3f);
-                go.transform.SetParent(buildingRoot);
-                ColorUtility.TryParseHtmlString(def.color, out var c);
-                go.GetComponent<Renderer>().material.color = c;
-                go.name = $"Decor_{d.id}";
+                Vector3 pos = GridToWorld(d.x, d.y);
+                GameObject decor;
+                if (decorPrefabs.TryGetValue(d.def, out var dp) && dp != null)
+                {
+                    decor = Instantiate(dp, buildingRoot);
+                    decor.transform.localPosition = pos;
+                    decor.name = $"Decor_{d.id}";
+                    ApplyPalette(decor, null, null);
+                }
+                else
+                {
+                    decor = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    decor.transform.position = pos + Vector3.up * 0.25f;
+                    decor.transform.localScale = new Vector3(0.3f, 0.25f, 0.3f);
+                    decor.transform.SetParent(buildingRoot);
+                    ColorUtility.TryParseHtmlString(def.color, out var c);
+                    decor.GetComponent<Renderer>().material.color = c;
+                    decor.name = $"Decor_{d.id}";
+                }
             }
         }
 
@@ -146,14 +184,12 @@ namespace PuebloLoco.Gameplay
             go.transform.localScale = Vector3.one * 0.8f;
         }
 
-        /// <summary>Pinta el edificio por nombre de material (pared, techo, puerta, ventana).</summary>
+        /// <summary>Pinta el edificio con los colores del catálogo y la paleta china.</summary>
         void TintBuilding(GameObject go, BuildingDef def)
         {
             Color wall, roof;
-            if (!ColorUtility.TryParseHtmlString(def.color, out wall)) wall = Color.white;
-            if (!ColorUtility.TryParseHtmlString(def.roof, out roof)) roof = Color.gray;
-            Color door = Color.Lerp(roof, Color.black, 0.55f);
-            Color window = new Color(0.62f, 0.86f, 0.95f);
+            if (!ColorUtility.TryParseHtmlString(def.color, out wall)) wall = new Color(0.82f, 0.62f, 0.38f);
+            if (!ColorUtility.TryParseHtmlString(def.roof, out roof)) roof = new Color(0.16f, 0.28f, 0.22f);
 
             var renderers = go.GetComponentsInChildren<Renderer>();
             foreach (var r in renderers)
@@ -163,9 +199,15 @@ namespace PuebloLoco.Gameplay
                 {
                     string n = mats[i] != null ? mats[i].name.ToLowerInvariant() : "";
                     Color c;
-                    if (n.Contains("window")) c = window;
-                    else if (n.Contains("door")) c = door;
-                    else if (n.Contains("roof") || n.Contains("awning") || n.Contains("pole") || n.Contains("counter")) c = roof;
+                    if (n.Contains("window")) c = new Color(0.62f, 0.86f, 0.95f);
+                    else if (n.Contains("paper")) c = new Color(0.92f, 0.87f, 0.72f);
+                    else if (n.Contains("door")) c = new Color(0.28f, 0.16f, 0.09f);
+                    else if (n.Contains("wood")) c = new Color(0.34f, 0.19f, 0.10f);
+                    else if (n.Contains("roof") || n.Contains("tile") || n.Contains("awning")) c = roof;
+                    else if (n.Contains("stone")) c = new Color(0.55f, 0.54f, 0.50f);
+                    else if (n.Contains("gold")) c = new Color(0.85f, 0.65f, 0.18f);
+                    else if (n.Contains("red")) c = new Color(0.62f, 0.12f, 0.10f);
+                    else if (n.Contains("bronze")) c = new Color(0.33f, 0.47f, 0.38f);
                     else c = wall;
 
                     var m = new Material(Shader.Find("Standard"));
@@ -175,6 +217,47 @@ namespace PuebloLoco.Gameplay
                     mats[i] = m;
                 }
                 r.sharedMaterials = mats;
+            }
+        }
+
+        /// <summary>Pinta un decor por nombre de material (paleta China); null = color por defecto.</summary>
+        void ApplyPalette(GameObject go, Color? tintA, Color? tintB)
+        {
+            var renderers = go.GetComponentsInChildren<Renderer>();
+            foreach (var r in renderers)
+            {
+                var mats = r.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    string n = mats[i] != null ? mats[i].name.ToLowerInvariant() : "";
+                    Color c;
+                    if (n.Contains("gold") || n.Contains("trim")) c = tintA ?? new Color(0.85f, 0.65f, 0.18f);
+                    else if (n.Contains("red")) c = tintA ?? new Color(0.62f, 0.12f, 0.10f);
+                    else if (n.Contains("paper")) c = tintA ?? new Color(0.92f, 0.87f, 0.72f);
+                    else if (n.Contains("bronze")) c = tintB ?? new Color(0.33f, 0.47f, 0.38f);
+                    else if (n.Contains("stone")) c = tintB ?? new Color(0.46f, 0.45f, 0.42f);
+                    else if (n.Contains("wood")) c = tintB ?? new Color(0.34f, 0.19f, 0.10f);
+                    else if (n.Contains("wall")) c = tintB ?? new Color(0.82f, 0.62f, 0.38f);
+                    else continue;
+
+                    var m = new Material(Shader.Find("Standard"));
+                    m.name = mats[i] != null ? mats[i].name : "dmat";
+                    m.color = c;
+                    m.SetFloat("_Glossiness", 0.12f);
+                    mats[i] = m;
+                }
+                r.sharedMaterials = mats;
+            }
+        }
+
+        /// <summary>Ajuste de escala para que los modelos importados entren en la grilla de 1 m.</summary>
+        static float VisualScale(string def)
+        {
+            switch (def)
+            {
+                case "pagoda": return 0.30f;
+                case "casahan": return 0.72f;
+                default: return 1f;
             }
         }
 
@@ -249,3 +332,4 @@ namespace PuebloLoco.Gameplay
         }
     }
 }
+

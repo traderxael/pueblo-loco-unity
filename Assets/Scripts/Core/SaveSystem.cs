@@ -26,11 +26,23 @@ namespace PuebloLoco.Core
                 string json = File.ReadAllText(SavePath);
                 var state = JsonUtility.FromJson<GameState>(json);
                 if (state == null || state.v != Catalog.VERSION) return CreateFresh(now);
+                EnsureCharacters(state);
                 return ApplyOffline(state, now);
             }
             catch
             {
                 return CreateFresh(now);
+            }
+        }
+
+        /// <summary>Agrega al guardado los personajes nuevos del catálogo (migración).</summary>
+        static void EnsureCharacters(GameState s)
+        {
+            if (s.characters == null) s.characters = new System.Collections.Generic.List<CharacterState>();
+            foreach (var c in Catalog.CHARACTERS)
+            {
+                if (!s.characters.Exists(x => x.def == c.def))
+                    s.characters.Add(new CharacterState { def = c.def, unlocked = c.donas == 0 });
             }
         }
 
