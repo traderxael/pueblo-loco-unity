@@ -122,7 +122,7 @@ namespace PuebloLoco.UI
                 string objs = "";
                 foreach (var o in q.objs)
                 {
-                    bool done = ObjectiveDone(s, o);
+                    bool done = Economy.ObjectiveDone(s, o);
                     objs += (done ? "✅ " : "⬜ ") + ObjectiveLabel(o) + "\n";
                 }
                 HUD.CreateText("Objs", row.transform, objs.TrimEnd(),
@@ -194,18 +194,6 @@ namespace PuebloLoco.UI
             go.GetComponent<Image>().color = color;
             return (RectTransform)go.transform;
         }
-
-        static bool ObjectiveDone(GameState s, QuestObjective o) => o.type switch
-        {
-            "build" => s.buildings.Exists(b => b.def == o.def),
-            "unlock" => s.characters.Exists(c => c.def == o.def && c.unlocked),
-            "level" => s.level >= o.level,
-            "coinsEarned" => s.stats.coinsEarned >= o.amount,
-            "tasksDone" => s.stats.tasksDone >= o.amount,
-            "buildings" => s.buildings.Count >= o.amount,
-            "decor" => s.decor.Count >= o.amount,
-            _ => false
-        };
 
         static string ObjectiveLabel(QuestObjective o) => o.type switch
         {

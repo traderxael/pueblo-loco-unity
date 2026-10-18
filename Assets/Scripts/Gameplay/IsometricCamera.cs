@@ -5,7 +5,7 @@ namespace PuebloLoco.Gameplay
     public class IsometricCamera : MonoBehaviour
     {
         [Header("Config")]
-        public float panSpeed = 0.05f;
+        public float panSpeed = 2.5f;
         public float zoomSpeed = 2f;
         public float minZoom = 4f;
         public float maxZoom = 15f;
@@ -15,12 +15,15 @@ namespace PuebloLoco.Gameplay
         Camera cam;
         Vector3 target;
         float distance = 8f;
+        float pinchPrev;
 
         void Start()
         {
             cam = GetComponent<Camera>();
             if (cam == null) cam = Camera.main;
-            target = new Vector3(3, 0, 3);
+            // La grilla está centrada en el origen; arrancar en (3,0,3) dejaba
+            // la cámara mirando la esquina del mapa.
+            target = Vector3.zero;
             Apply();
         }
 
@@ -32,7 +35,10 @@ namespace PuebloLoco.Gameplay
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) dir += new Vector3(-1, 0, -1);
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) dir += new Vector3(-1, 0, 1);
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) dir += new Vector3(1, 0, -1);
-            target += dir * panSpeed * distance * Time.deltaTime * 60f;
+            // Normalizar: sin esto, dos teclas en diagonal mueven sqrt(2) más rápido.
+            if (dir.sqrMagnitude > 0f) dir.Normalize();
+            target += dir * panSpeed * Time.deltaTime;
+            ClampTarget();
 
             // Zoom: rueda del ratón
             float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -46,16 +52,22 @@ namespace PuebloLoco.Gameplay
                 Vector3 right = transform.right, fwd = transform.forward;
                 right.y = 0; fwd.y = 0;
                 right.Normalize(); fwd.Normalize();
-                target += (-right * delta.x + fwd * delta.y) * panSpeed * distance * 0.02f;
+                target += (-right * delta.x + fwd * delta.y) * panSpeed * 0.02f;
             }
 
-            // Touch zoom (2 dedos)
+            // Touch zoom (2 dedos): hay que guardar la distancia del frame anterior.
+            // Calcular "prev" con las posiciones actuales y sus deltas actuales
+            // produce un valor que nunca cambia de verdad.
             if (Input.touchCount == 2)
             {
-                float prevDist = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude -
-                                 (Input.GetTouch(0).deltaPosition - Input.GetTouch(1).deltaPosition).magnitude;
                 float currDist = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
-                distance = Mathf.Clamp(distance - (currDist - prevDist) * 0.01f * zoomSpeed, minZoom, maxZoom);
+                if (pinchPrev > 0f)
+                    distance = Mathf.Clamp(distance - (currDist - pinchPrev) * 0.01f * zoomSpeed, minZoom, maxZoom);
+                pinchPrev = currDist;
+            }
+            else
+            {
+                pinchPrev = 0f;
             }
 
             Apply();
@@ -71,11 +83,23 @@ namespace PuebloLoco.Gameplay
         public void FocusOn(Vector3 worldPos)
         {
             target = worldPos;
+            ClampTarget();
         }
 
         public void SetDistance(float d)
         {
             distance = Mathf.Clamp(d, minZoom, maxZoom);
+        }
+
+        /// <summary>Impide dejar la cámara fuera del terreno.</summary>
+        void ClampTarget()
+        {
+            var gm = Gameplay.GameManager.Instance;
+            if (gm == null || gm.State == null) return;
+            int size = Core.Catalog.LAND_TIERS[gm.State.landTier].size;
+            float limit = size * 0.5f + 1.5f;
+            target.x = Mathf.Clamp(target.x, -limit, limit);
+            target.z = Mathf.Clamp(target.z, -limit, limit);
         }
     }
 }

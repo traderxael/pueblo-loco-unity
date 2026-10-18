@@ -92,6 +92,37 @@ A partir de la presentación sobre las dinastías Xia, Shang y Zhou hecha en **C
 
 ![Texturas en el juego](docs/china3-pueblo.png)
 
+### Tipologías nuevas y rig Humanoid (v3)
+
+**Edificios nuevos** (Blender → catálogo → juego):
+
+| Tipología | Asset | En el juego |
+|---|---|---|
+| Mercado | `SM_Building_Market` | **Mercado del Barrio** (1.500) |
+| Templo | `SM_Building_Temple` | **Templo Taoísta** (9.000) |
+| Muralla | `SM_Building_Wall` | **Muralla** (2.500) |
+
+- El mercado suma toldo de lona, dos puestos con mercancía, cajas, vasija y farolillos.
+- El templo tiene escalinata, altar con incensario, doble techo y banderolas.
+- La muralla trae almenas, camino de ronda y puerta con hoja de madera.
+- Escalas visuales por tipología para que entren en la grilla de 1 m.
+
+**Rig Humanoid**
+
+- `SK_Sabio` y `SK_Guardia` se importan como **Humanoid** (`avatar = válido`, 22 huesos,
+  8 clips) y el juego lo verifica en tiempo de ejecución (`animators=10, humanoides=2`).
+- `Villager`, `Kid` y `Elder` siguen en rig **Generic** (sin cambios).
+- Con Humanoid los personajes chinos quedan listos para retargetear animaciones de
+  Mixamo o del [Universal Animation Library](https://store.godotengine.org/asset/quaternius/universal-animation-library/).
+
+![Aldea con tipologías](docs/china4-pueblo.png)
+
+| Mercado | Templo | Muralla |
+|---|---|---|
+| ![Mercado](docs/china4-mercado.png) | ![Templo](docs/china4-templo.png) | ![Muralla](docs/china4-muralla.png) |
+
+![Detalle en el juego](docs/china4-detalle.png)
+
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que

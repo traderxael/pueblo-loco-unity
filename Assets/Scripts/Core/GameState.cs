@@ -103,10 +103,16 @@ namespace PuebloLoco.Core
         }
 
         private static long _idCounter = 1;
+        private static readonly System.Random _rng = new System.Random();
+
         public static string NextId()
         {
-            var r = new Random();
-            return "e" + (_idCounter++) + "_" + r.Next(1000000);
+            // Un solo RNG para toda la sesión: new Random() por llamada sembraba con
+            // el reloj y podía repetir sufijo entre llamadas seguidas.
+            long n = System.Threading.Interlocked.Increment(ref _idCounter);
+            int salt;
+            lock (_rng) { salt = _rng.Next(1000000); }
+            return "e" + n + "_" + salt;
         }
 
         public bool HasAchievement(string id) => achievements.Contains(id);

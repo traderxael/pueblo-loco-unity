@@ -27,6 +27,7 @@ namespace PuebloLoco.Gameplay
         float animSpeed;
         static readonly HashSet<Vector2Int> occupied = new HashSet<Vector2Int>();
         Vector3 lastPosition;
+        Vector3 stuckAnchor;
         float stuckTimer;
 
         public void Setup(string id, Animator a)
@@ -146,7 +147,7 @@ namespace PuebloLoco.Gameplay
         bool MoveTowards(Vector3 dest, float dt)
         {
             Vector3 delta = Flat(dest - transform.position);
-            if (delta.magnitude <= 0.08f) return true;
+            if (delta.magnitude <= 0.08f) { stuckTimer = 0f; return true; }
 
             Vector3 dir = delta.normalized;
             Vector3 next = transform.position + dir * moveSpeed * dt;
@@ -161,10 +162,28 @@ namespace PuebloLoco.Gameplay
 
             next = ClampToLand(next);
             transform.position = next;
-            LookAt(next - dir, dt, 8f);
             transform.rotation = Quaternion.Slerp(transform.rotation,
                 Quaternion.LookRotation(dir, Vector3.up), 1f - Mathf.Exp(-9f * dt));
+
+            UpdateStuck(dt);
             return false;
+        }
+
+        /// <summary>Si no se movió del sitio durante un rato, el destino es inalcanzable
+        /// (bloqueado por un edificio o fuera del terreno): se elige otro antes de
+        /// quedarse congelado en modo Walk para siempre.</summary>
+        void UpdateStuck(float dt)
+        {
+            if (Flat(transform.position - stuckAnchor).sqrMagnitude < 0.0009f)
+            {
+                stuckTimer += dt;
+                if (stuckTimer < 1.2f) return;
+                stuckTimer = 0f;
+                PickWanderTarget();
+                return;
+            }
+            stuckTimer = 0f;
+            stuckAnchor = transform.position;
         }
 
         void LookAt(Vector3 worldPoint, float dt, float sharpness)
@@ -189,7 +208,9 @@ namespace PuebloLoco.Gameplay
             var gm = GameManager.Instance;
             if (gm == null) return p;
             int size = Catalog.LAND_TIERS[gm.State.landTier].size;
-            float half = size * 0.5f - 0.65f;
+            // El centro de la tesela más externa está en size/2 - 0.5: si el límite
+            // queda por debajo, el vecino nunca llega y se queda congelado.
+            float half = size * 0.5f - 0.15f;
             p.x = Mathf.Clamp(p.x, -half, half);
             p.z = Mathf.Clamp(p.z, -half, half);
             return p;
@@ -199,6 +220,8 @@ namespace PuebloLoco.Gameplay
         {
             var gm = GameManager.Instance;
             var grid = GridBuildSystem.Instance;
+            stuckTimer = 0f;
+            stuckAnchor = transform.position;
             if (gm == null || grid == null) { target = transform.position; return; }
 
             int size = Catalog.LAND_TIERS[gm.State.landTier].size;
@@ -210,7 +233,7 @@ namespace PuebloLoco.Gameplay
                 Vector3 w = grid.GridToWorld(x, y);
                 w.x += Random.Range(-0.3f, 0.3f);
                 w.z += Random.Range(-0.3f, 0.3f);
-                target = w;
+                target = ClampToLand(w);
                 return;
             }
             target = Vector3.zero;
@@ -219,21 +242,32 @@ namespace PuebloLoco.Gameplay
         Vector3 FindWorkSpot()
         {
             var gm = GameManager.Instance;
-            if (gm == null) return transform.position;
+            var grid = GridBuildSystem.Instance;
+            if (gm == null || grid == null) return transform.position;
+
             var buildings = gm.State.buildings;
-            if (buildings.Count > 0)
+            for (int attempt = 0; attempt < 8; attempt++)
             {
-                var b = buildings[Random.Range(0, buildings.Count)];
-                var grid = GridBuildSystem.Instance;
-                if (grid != null)
+                Vector3 candidate;
+                if (buildings.Count > 0)
                 {
-                    Vector3 p = grid.GridToWorld(b.x, b.y);
-                    Vector2 dir = Random.insideUnitCircle.normalized;
-                    if (dir.sqrMagnitude < 0.1f) dir = Vector2.right;
-                    return ClampToLand(p + new Vector3(dir.x, 0f, dir.y) * 1.15f);
+                    var b = buildings[Random.Range(0, buildings.Count)];
+                    var def = Catalog.Building(b.def);
+                    int size = def != null ? Mathf.Max(1, def.size) : 1;
+                    Vector3 center = grid.FootprintCenter(b.x, b.y, size);
+                    float ang = Random.Range(0f, Mathf.PI * 2f);
+                    float radius = size * 0.5f + 0.75f;
+                    candidate = center + new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * radius;
                 }
+                else
+                {
+                    candidate = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
+                }
+
+                candidate = ClampToLand(candidate);
+                if (!IsBlocked(candidate)) return candidate;
             }
-            return ClampToLand(new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)));
+            return ClampToLand(transform.position);
         }
 
         static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);

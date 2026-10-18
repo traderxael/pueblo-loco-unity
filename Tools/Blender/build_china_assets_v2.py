@@ -1,4 +1,4 @@
-﻿"""
+"""
 PUEBLO LOCO â€” Ciudad China Antigua (v2)
 Assets rediseÃ±ados siguiendo el prompt maestro (Tang/Ming, semi-estilizado).
 
@@ -54,6 +54,7 @@ bc.MAT_COLORS.update({
     "Wall": LIME, "RoofTiles": ROOFBLUE, "Wood": DARKWOOD, "Red": LACQUER,
     "Paper": LIME, "Trim": GOLD, "Robe": LACQUER, "Boots": INK,
     "Armor": GOLD, "Trousers": INK, "Door": DARKWOOD, "Window": LIME,
+    "Canvas": (0.85, 0.78, 0.62, 1.0), "CanvasRed": LACQUER,
 })
 
 
@@ -833,6 +834,9 @@ def main():
     build_paifang()
     build_ding()
     build_lantern()
+    build_market()
+    build_temple()
+    build_wall()
     build_sabio()
     build_guardia()
     index = {
@@ -850,8 +854,108 @@ def main():
     print("[CHINA2] fin: %d assets" % len(REGISTRY), flush=True)
 
 
+# ---------------------------------------------------------------------------
+# tipologías nuevas: mercado, templo, muralla
+# ---------------------------------------------------------------------------
+
+def build_market():
+    bc.reset_scene()
+    o = []
+    o.append(box("base", (0, 0, 0.10), (3.1, 0.20, 2.3), "Stone"))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            o.append(cyl("post", (1.35 * sx, 0.95 * sy, 1.10), 0.06, 0.055, 2.0, "DarkWood", 8))
+            o.append(box("postBase", (1.35 * sx, 0.95 * sy, 0.22), (0.22, 0.22, 0.12), "Stone"))
+    o.append(box("beamN", (0, 0.95, 2.10), (2.9, 0.12, 0.12), "DarkWood"))
+    o.append(box("beamS", (0, -0.95, 2.10), (2.9, 0.12, 0.12), "DarkWood"))
+    o.append(box("beamE", (1.35, 0, 2.10), (0.12, 2.0, 0.12), "DarkWood"))
+    o.append(box("beamW", (-1.35, 0, 2.10), (0.12, 2.0, 0.12), "DarkWood"))
+    r = roof("awning", 3.0, 2.2, 0.5, 0.28, 0.14, mat="Canvas", ridge_mat="CanvasRed")
+    for ob in r:
+        ob.location.z += 2.16
+    o += r
+    for sx in (-0.75, 0.75):
+        o.append(box("counter", (sx, -0.25, 0.85), (0.9, 0.5, 0.08), "DarkWood"))
+        o.append(box("counterLegA", (sx - 0.35, -0.25, 0.60), (0.08, 0.45, 0.45), "DarkWood"))
+        o.append(box("counterLegB", (sx + 0.35, -0.25, 0.60), (0.08, 0.45, 0.45), "DarkWood"))
+        for k in range(3):
+            o.append(ball("goods", (sx - 0.25 + k * 0.25, -0.25, 0.93), 0.06,
+                          "Lacquer" if k % 2 else "Gold", subdiv=1))
+    o.append(box("crate1", (1.05, 0.55, 0.30), (0.40, 0.40, 0.40), "DarkWood"))
+    o.append(box("crate2", (0.62, 0.75, 0.26), (0.34, 0.34, 0.32), "DarkWood"))
+    o.append(cyl("jar", (-1.05, 0.60, 0.35), 0.18, 0.14, 0.50, "Bronze", 10))
+    for sx in (-1, 1):
+        o += lantern("lant", 1.15 * sx, -1.05, 1.75, 0.11)
+    o.append(box("sign", (0, -1.12, 2.00), (0.9, 0.05, 0.28), "Lacquer"))
+    body = join(o, "Market")
+    uv_unwrap(body)
+    preview("Mercado", 4.2, 1.4)
+    path = os.path.join(OUT, "SM_Building_Market.fbx")
+    export_static(path, body)
+    register("SM_Building_Market", path, tris_of(body), kind="building")
+
+
+def build_temple():
+    bc.reset_scene()
+    o = []
+    o.append(box("base", (0, 0, 0.14), (3.4, 0.28, 3.0), "Stone"))
+    o.append(box("base2", (0, 0, 0.28), (3.1, 0.10, 2.7), "Stone"))
+    for k in range(3):
+        o.append(box("step", (0, -1.45, 0.10 + k * 0.10), (1.6 - k * 0.15, 0.30, 0.10), "Stone"))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            o.append(cyl("col", (1.10 * sx, 1.00 * sy, 1.35), 0.10, 0.09, 2.10, "Lacquer", 10))
+    o.append(box("wallBack", (0, 1.02, 1.30), (2.30, 0.10, 1.90), "Lime"))
+    o.append(box("wallL", (-1.12, 0, 1.30), (0.10, 2.10, 1.90), "Lime"))
+    o.append(box("wallR", (1.12, 0, 1.30), (0.10, 2.10, 1.90), "Lime"))
+    o.append(box("doorFrame", (0, -1.05, 1.05), (1.00, 0.10, 1.50), "Lacquer"))
+    o.append(box("door", (0, -1.10, 0.85), (0.80, 0.06, 1.10), "DarkWood"))
+    o += lattice_window("winL", -0.70, -1.05, 1.45, 0.35, 0.40)
+    o += lattice_window("winR", 0.70, -1.05, 1.45, 0.35, 0.40)
+    o.append(box("altar", (0, 0.55, 0.85), (1.20, 0.50, 0.90), "DarkWood"))
+    o.append(cyl("burner", (0, 0.55, 1.40), 0.18, 0.16, 0.22, "Bronze", 10))
+    o.append(cyl("lid", (0, 0.55, 1.55), 0.16, 0.10, 0.10, "Gold", 10))
+    o += dougong("dg", 2.5, 2.2, 2.35, 4)
+    r1 = roof("roof1", 2.6, 2.3, 0.60, 0.40, 0.20)
+    for ob in r1:
+        ob.location.z += 2.40
+    o += r1
+    r2 = roof("roof2", 1.6, 1.4, 0.45, 0.30, 0.16)
+    for ob in r2:
+        ob.location.z += 3.15
+    o += r2
+    for sx in (-1, 1):
+        o += banner("band", 1.10 * sx, -1.15, 1.60, 0.24, 0.80)
+        o += lantern("lant", 0.85 * sx, -1.15, 2.10, 0.12)
+    body = join(o, "Temple")
+    uv_unwrap(body)
+    preview("Templo", 4.8, 1.6)
+    path = os.path.join(OUT, "SM_Building_Temple.fbx")
+    export_static(path, body)
+    register("SM_Building_Temple", path, tris_of(body), kind="building")
+
+
+def build_wall():
+    bc.reset_scene()
+    o = []
+    o.append(box("gateL", (-1.20, 0, 1.00), (1.20, 1.25, 2.00), "Stone"))
+    o.append(box("gateR", (1.20, 0, 1.00), (1.20, 1.25, 2.00), "Stone"))
+    o.append(box("lintel", (0, 0, 2.10), (2.40, 1.30, 0.35), "Stone"))
+    o.append(box("door", (0, 0, 0.90), (1.60, 0.10, 1.70), "DarkWood"))
+    o.append(box("walk", (0, 0, 2.06), (4.00, 1.20, 0.12), "Stone"))
+    for i in range(6):
+        x = -1.70 + i * 0.68
+        o.append(box("merlonN", (x, 0.50, 2.35), (0.42, 0.50, 0.50), "Stone"))
+        o.append(box("merlonS", (x, -0.50, 2.35), (0.42, 0.50, 0.50), "Stone"))
+    for sx in (-1, 1):
+        o.append(box("wing", (2.55 * sx, 0, 1.00), (1.10, 1.20, 2.00), "Stone"))
+        o.append(box("wingWalk", (2.55 * sx, 0, 2.06), (1.10, 1.20, 0.12), "Stone"))
+    body = join(o, "Wall")
+    uv_unwrap(body)
+    preview("Muralla", 5.6, 1.7)
+    path = os.path.join(OUT, "SM_Building_Wall.fbx")
+    export_static(path, body)
+    register("SM_Building_Wall", path, tris_of(body), kind="building")
+
 if __name__ == "__main__":
     main()
-
-
-

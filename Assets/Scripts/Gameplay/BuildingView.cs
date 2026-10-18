@@ -25,14 +25,13 @@ namespace PuebloLoco.Gameplay
 
             label = bubbleGo.AddComponent<TextMesh>();
             label.text = "";
+            // Sin fuente el TextMesh no dibuja nada: el número nunca aparecía.
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.fontSize = 48;
             label.characterSize = 0.05f;
             label.anchor = TextAnchor.MiddleCenter;
             label.alignment = TextAlignment.Center;
             label.color = Color.yellow;
-
-            var renderer = bubbleGo.GetComponent<MeshRenderer>();
-            if (renderer != null) renderer.material = Resources.Load<Material>("Default-Particle");
         }
 
         System.Collections.IEnumerator PopIn()
@@ -58,6 +57,7 @@ namespace PuebloLoco.Gameplay
             if (checkTimer < 0.5f) return;
             checkTimer = 0;
 
+            if (GameManager.Instance == null || label == null) return;
             var s = GameManager.Instance.State;
             var b = s.buildings.Find(x => x.id == buildingId);
             if (b == null) { label.text = ""; return; }
@@ -69,16 +69,14 @@ namespace PuebloLoco.Gameplay
                 // flotar
                 bubble.transform.localPosition = Vector3.up * (def.size * 1.4f + Mathf.Sin(Time.time * 2) * 0.05f);
                 // click para cobrar
-                if (Input.GetMouseButtonDown(0) && Camera.main != null)
+                if (Input.GetMouseButtonDown(0) && Camera.main != null &&
+                    (GridBuildSystem.Instance == null || !GridBuildSystem.Instance.IsPlacing))
                 {
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out var hit, 100f))
                     {
-                        if (hit.collider != null && hit.collider.transform.IsChildOf(transform) ||
-                            hit.transform == transform)
-                        {
-                            GameManager.Instance.CollectBuilding(buildingId);
-                        }
+                        bool mine = hit.transform == transform || hit.transform.IsChildOf(transform);
+                        if (mine) GameManager.Instance.CollectBuilding(buildingId);
                     }
                 }
             }

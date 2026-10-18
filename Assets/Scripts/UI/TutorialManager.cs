@@ -12,7 +12,7 @@ namespace PuebloLoco.UI
 
         GameObject card, arrow;
         Text cardText, skipBtn;
-        RectTransform arrowRect;
+        RectTransform arrowRect, bounceRect;
         float checkTimer;
         bool flagShop, flagCollect, flagTask, flagQuests;
 
@@ -61,24 +61,32 @@ namespace PuebloLoco.UI
             skipLabel.color = new Color(0.8f, 0.8f, 0.85f);
             skip.onClick.AddListener(() => EndTutorial(true));
 
-            // flecha animada
-            var arrowGo = new GameObject("Arrow", typeof(RectTransform), typeof(Image));
+            // Flecha: la raíz se ancla sobre el botón y un hijo hace el rebote.
+            // Si el rebote se aplicara a la misma raíz, el anchoredPosition pisaría
+            // la posición calculada y la flecha quedaría siempre en el mismo lado.
+            var arrowGo = new GameObject("Arrow", typeof(RectTransform));
             arrowGo.transform.SetParent(transform, false);
             arrowRect = (RectTransform)arrowGo.transform;
             arrowRect.sizeDelta = new Vector2(48, 48);
-            var img = arrowGo.GetComponent<Image>();
-            img.color = new Color(1f, 0.9f, 0.2f);
-            // forma de flecha con triángulo
-            var text = HUD.CreateText("ArrowGlyph", arrowGo.transform, "▼", 42, TextAnchor.MiddleCenter,
+
+            var bounceGo = new GameObject("Bounce", typeof(RectTransform));
+            bounceGo.transform.SetParent(arrowGo.transform, false);
+            bounceRect = (RectTransform)bounceGo.transform;
+            bounceRect.anchorMin = Vector2.zero;
+            bounceRect.anchorMax = Vector2.one;
+            bounceRect.offsetMin = Vector2.zero;
+            bounceRect.offsetMax = Vector2.zero;
+
+            var text = HUD.CreateText("ArrowGlyph", bounceGo.transform, "▼", 42, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, Vector2.zero);
             text.color = new Color(1f, 0.9f, 0.2f);
-            Destroy(img);
             arrow = arrowGo;
         }
 
         void Update()
         {
-            var s = GameManager.Instance.State;
+            var gm = GameManager.Instance;
+            var s = gm != null ? gm.State : null;
             if (s == null || s.tutorial < 0) { HideAll(); return; }
 
             checkTimer += Time.deltaTime;
@@ -97,7 +105,6 @@ namespace PuebloLoco.UI
                 if (step == null) { EndTutorial(false); return; }
                 GameManager.Instance.Save();
             }
-
             card.SetActive(true);
             cardText.text = step.text;
             PositionArrow(step.target);
@@ -135,14 +142,13 @@ namespace PuebloLoco.UI
             Vector2 screenPos = rt.TransformPoint(rt.rect.center);
             arrowRect.position = screenPos + new Vector2(0, -50);
             arrow.SetActive(true);
-            // rebote
-            arrowRect.anchoredPosition = new Vector2(0, Mathf.Sin(Time.time * 4) * 8);
+            bounceRect.anchoredPosition = new Vector2(0, Mathf.Sin(Time.time * 4) * 8);
         }
 
         GameObject FindTarget(string name)
         {
             // buscar en toda la jerarquía de UI
-            var all = FindObjectsByType<RectTransform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var all = FindObjectsByType<RectTransform>(FindObjectsInactive.Include);
             foreach (var rt in all)
                 if (rt.name == name && rt.gameObject.activeInHierarchy)
                     return rt.gameObject;
@@ -157,12 +163,13 @@ namespace PuebloLoco.UI
 
         public void EndTutorial(bool skipped)
         {
-            var s = GameManager.Instance.State;
+            var gm = GameManager.Instance;
+            var s = gm != null ? gm.State : null;
             if (s != null) s.tutorial = -1;
             HideAll();
             if (!skipped)
                 Toast.Show("🎓 ¡Tutorial completo! Ya eres alcalde de Pueblo Loco");
-            GameManager.Instance?.Save();
+            gm?.Save();
         }
 
         /* señales desde otros sistemas */

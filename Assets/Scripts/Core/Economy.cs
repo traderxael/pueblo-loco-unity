@@ -80,7 +80,9 @@ namespace PuebloLoco.Core
         {
             int size = Catalog.LAND_TIERS[s.landTier].size;
             var occ = OccupancyMap(s);
-            var rng = new Random();
+            // RNG propio: new Random() se siembra con el reloj, así que dos llamadas
+            // en el mismo tick devolvían la misma tesela.
+            var rng = new Random(Catalog.HashStr(s.coins + "|" + s.decor.Count + "|" + s.buildings.Count));
             for (int tries = 0; tries < 500; tries++)
             {
                 int x = rng.Next(size), y = rng.Next(size);
@@ -333,10 +335,10 @@ namespace PuebloLoco.Core
             b.lastAt += cycles * step;
         }
 
-        static int BuildingMult(GameState s, string defId)
+        static double BuildingMult(GameState s, string defId)
         {
             var e = ActiveEvent(s);
-            if (e != null && e.kind == "building" && e.target == defId) return (int)e.mult;
+            if (e != null && e.kind == "building" && e.target == defId) return e.mult;
             return 1;
         }
 

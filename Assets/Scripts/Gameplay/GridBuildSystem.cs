@@ -16,6 +16,12 @@ namespace PuebloLoco.Gameplay
         [System.NonSerialized] public Dictionary<string, GameObject> decorPrefabs = new Dictionary<string, GameObject>();
 
         const float TILE = 1f;
+        /// <summary>Layer 2 = "Ignore Raycast" (viene de fábrica en ProjectSettings).
+        /// Los vecinos se colocan ahí para que el raycast de construcción apunte al
+        /// terreno y no a un vecino parado en medio del pueblo.</summary>
+        public const int VillagerLayer = 2;
+        int placeMask => ~(1 << VillagerLayer);
+
         Transform tileRoot;
         Transform buildingRoot;
         readonly Dictionary<string, GameObject> placedViews = new Dictionary<string, GameObject>();
@@ -70,6 +76,9 @@ namespace PuebloLoco.Gameplay
             {
                 { "casahan", "China/SM_Building_CasaHan" },
                 { "pagoda", "China/SM_Building_Pagoda_05" },
+                { "mercado", "China/SM_Building_Market" },
+                { "muralla", "China/SM_Building_Wall" },
+                { "templo", "China/SM_Building_Temple" },
             };
             foreach (var kv in chinaBuildings)
             {
@@ -99,6 +108,15 @@ namespace PuebloLoco.Gameplay
             return new Vector3(offset + (x + 0.5f) * TILE, 0, offset + (y + 0.5f) * TILE);
         }
 
+        /// <summary>Centro de la huella de un edificio de `size` teselas anclado en (x,y).
+        /// Sin esto los edificios de 2x2 y 3x3 quedan corridos media tesela y los del
+        /// borde sobresalen del terreno.</summary>
+        public Vector3 FootprintCenter(int x, int y, int size)
+        {
+            float o = (size - 1) * 0.5f;
+            return GridToWorld(x, y) + new Vector3(o, 0f, o);
+        }
+
         public bool WorldToGrid(Vector3 world, out int gx, out int gy)
         {
             var s = GameManager.Instance.State;
@@ -111,6 +129,8 @@ namespace PuebloLoco.Gameplay
 
         public void RebuildAll()
         {
+            if (tileRoot == null || buildingRoot == null) return;
+            if (GameManager.Instance == null) return;
             foreach (Transform t in tileRoot) Destroy(t.gameObject);
             foreach (Transform t in buildingRoot) Destroy(t.gameObject);
             placedViews.Clear();
@@ -146,7 +166,7 @@ namespace PuebloLoco.Gameplay
                 var def = Catalog.Building(b.def);
                 GameObject prefab = buildingPrefabs.TryGetValue(b.def, out var p) ? p : CreateFallback(def);
                 var go = Instantiate(prefab, buildingRoot);
-                go.transform.localPosition = GridToWorld(b.x, b.y);
+                go.transform.localPosition = FootprintCenter(b.x, b.y, def.size);
                 go.name = $"Building_{b.id}";
                 go.transform.localScale = Vector3.one * (def.size * VisualScale(def.def));
                 TintBuilding(go, def);
@@ -317,6 +337,9 @@ namespace PuebloLoco.Gameplay
             {
                 case "pagoda": return 0.19f;
                 case "casahan": return 0.45f;
+                case "mercado": return 0.34f;
+                case "muralla": return 0.30f;
+                case "templo": return 0.30f;
                 default: return 1f;
             }
         }
@@ -332,15 +355,21 @@ namespace PuebloLoco.Gameplay
 
         /* ------------------------------------------------ modo colocación */
 
+        public bool IsPlacing => placing;
+
         public void BeginPlacing(string defId)
         {
+            var def = Catalog.Building(defId);
+            if (def == null) return;
+            CancelPlacing();
             placingDef = defId;
             placing = true;
-            if (ghost != null) Destroy(ghost);
-            var def = Catalog.Building(defId);
             GameObject prefab = buildingPrefabs.TryGetValue(defId, out var p) ? p : CreateFallback(def);
             ghost = Instantiate(prefab);
-            ghost.transform.localScale = Vector3.one * def.size;
+            ghost.name = "Ghost_" + defId;
+            // La escala tiene que coincidir con la del edificio final (VisualScale);
+            // si no, el fantasma de la pagoda sale 5x más grande que el modelo real.
+            ghost.transform.localScale = Vector3.one * (def.size * VisualScale(def.def));
             SetGhostAlpha(ghost, 0.5f);
         }
 
@@ -356,17 +385,21 @@ namespace PuebloLoco.Gameplay
             if (!placing || ghost == null) return;
             var cam = Camera.main;
             if (cam == null) return;
+            var gm = GameManager.Instance;
+            if (gm == null) { CancelPlacing(); return; }
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hit, 100f))
+            if (Physics.Raycast(ray, out var hit, 100f, placeMask))
             {
                 if (WorldToGrid(hit.point, out int gx, out int gy))
                 {
-                    ghost.transform.position = GridToWorld(gx, gy);
-                    var check = Economy.CanPlaceBuilding(GameManager.Instance.State, placingDef, gx, gy);
+                    var def = Catalog.Building(placingDef);
+                    int size = def != null ? def.size : 1;
+                    ghost.transform.position = FootprintCenter(gx, gy, size);
+                    var check = Economy.CanPlaceBuilding(gm.State, placingDef, gx, gy);
                     SetGhostColor(ghost, check.ok ? Color.green : Color.red);
                     if (Input.GetMouseButtonDown(0) && check.ok)
                     {
-                        var r = GameManager.Instance.PlaceBuilding(placingDef, gx, gy);
+                        var r = gm.PlaceBuilding(placingDef, gx, gy);
                         if (r.ok) CancelPlacing();
                     }
                 }
@@ -375,12 +408,22 @@ namespace PuebloLoco.Gameplay
                 CancelPlacing();
         }
 
+        /// <summary>En el shader Standard, poner solo "_Mode" no alcanza: hay que
+        /// cambiar el blend y el ZWrite y habilitar el keyword, o el fantasma queda opaco.</summary>
         void SetGhostAlpha(GameObject go, float a)
         {
             foreach (var r in go.GetComponentsInChildren<Renderer>())
             {
                 var m = r.material;
                 m.SetFloat("_Mode", 3);
+                m.SetOverrideTag("RenderType", "Transparent");
+                m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                m.SetInt("_ZWrite", 0);
+                m.DisableKeyword("_ALPHATEST_ON");
+                m.EnableKeyword("_ALPHABLEND_ON");
+                m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                 var c = m.color; c.a = a; m.color = c;
             }
         }
@@ -388,7 +431,16 @@ namespace PuebloLoco.Gameplay
         void SetGhostColor(GameObject go, Color tint)
         {
             foreach (var r in go.GetComponentsInChildren<Renderer>())
-                r.material.color = Color.Lerp(r.material.color, tint, 0.3f);
+            {
+                var m = r.material;
+                // Solo el color: Color.Lerp arrastraría el alfa hacia el del tinte
+                // (opaco) y el fantasma dejaría de verse translúcido.
+                var c = m.color;
+                c.r = Mathf.Lerp(c.r, tint.r, 0.3f);
+                c.g = Mathf.Lerp(c.g, tint.g, 0.3f);
+                c.b = Mathf.Lerp(c.b, tint.b, 0.3f);
+                m.color = c;
+            }
         }
     }
 }

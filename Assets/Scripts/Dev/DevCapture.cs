@@ -109,8 +109,8 @@ namespace PuebloLoco.Dev
             var layout = new[]
             {
                 ("casa", 0, 0), ("kiosco", 2, 1), ("panaderia", 4, 0),
-                ("casahan", 1, 2), ("pagoda", 3, 3), ("casahan", 0, 5),
-                ("casahan", 5, 5), ("casa", 2, 6)
+                ("casahan", 1, 2), ("pagoda", 3, 3), ("mercado", 0, 5),
+                ("templo", 4, 5), ("muralla", 6, 2)
             };
             foreach (var l in layout)
             {
@@ -153,7 +153,6 @@ namespace PuebloLoco.Dev
             if (guardia != null) guardia.task = new ActiveTask { taskId = "patrullar", endAt = gm.NowMs + 300000, done = false };
 
             gm.NotifyChanged();
-            if (GridBuildSystem.Instance != null) GridBuildSystem.Instance.RebuildAll();
             if (VillagerManager.Instance != null)
             {
                 VillagerManager.Instance.forceAll = true;

@@ -9,7 +9,7 @@ namespace PuebloLoco
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoInit()
         {
-            if (Object.FindFirstObjectByType<Bootstrap>() != null) return;
+            if (Object.FindAnyObjectByType<Bootstrap>() != null) return;
             var go = new GameObject("Bootstrap");
             go.AddComponent<Bootstrap>();
         }
@@ -21,7 +21,7 @@ namespace PuebloLoco
                 new GameObject("GameManager").AddComponent<GameManager>();
 
             // Luz principal (sol)
-            if (FindFirstObjectByType<Light>() == null)
+            if (FindAnyObjectByType<Light>() == null)
             {
                 var lightGo = new GameObject("Sun");
                 var light = lightGo.AddComponent<Light>();
@@ -52,22 +52,22 @@ namespace PuebloLoco
                 cam.gameObject.AddComponent<IsometricCamera>();
 
             // Grid + UI
-            if (FindFirstObjectByType<GridBuildSystem>() == null)
+            if (FindAnyObjectByType<GridBuildSystem>() == null)
                 new GameObject("GridBuildSystem").AddComponent<GridBuildSystem>();
-            if (FindFirstObjectByType<HUD>() == null)
+            if (FindAnyObjectByType<HUD>() == null)
                 new GameObject("HUD").AddComponent<HUD>();
-            if (FindFirstObjectByType<BuildMenu>() == null)
+            if (FindAnyObjectByType<BuildMenu>() == null)
                 new GameObject("BuildMenu").AddComponent<BuildMenu>();
-            if (FindFirstObjectByType<FriendsMenu>() == null)
+            if (FindAnyObjectByType<FriendsMenu>() == null)
                 new GameObject("FriendsMenu").AddComponent<FriendsMenu>();
-            if (FindFirstObjectByType<QuestsMenu>() == null)
+            if (FindAnyObjectByType<QuestsMenu>() == null)
                 new GameObject("QuestsMenu").AddComponent<QuestsMenu>();
-            if (FindFirstObjectByType<DecorMenu>() == null)
+            if (FindAnyObjectByType<DecorMenu>() == null)
                 new GameObject("DecorMenu").AddComponent<DecorMenu>();
             TutorialManager.Ensure();
 
             // Vecinos animados (modelos con esqueleto hechos en Blender)
-            if (FindFirstObjectByType<VillagerManager>() == null)
+            if (FindAnyObjectByType<VillagerManager>() == null)
                 new GameObject("Villagers").AddComponent<VillagerManager>();
         }
     }

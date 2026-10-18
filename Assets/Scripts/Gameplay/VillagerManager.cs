@@ -14,7 +14,8 @@ namespace PuebloLoco.Gameplay
         public static VillagerManager Instance { get; private set; }
 
         readonly Dictionary<string, GameObject> spawned = new Dictionary<string, GameObject>();
-        public bool forceAll; // modo demo/capturas
+        public bool forceAll;
+        static bool animLogged; // modo demo/capturas
 
         void Awake()
         {
@@ -81,6 +82,7 @@ namespace PuebloLoco.Gameplay
             var go = new GameObject("Villager_" + defId);
             go.transform.SetParent(transform, false);
             go.transform.position = SpawnPoint(spawned.Count);
+            go.layer = GridBuildSystem.VillagerLayer;
 
             var prefab = Resources.Load<GameObject>("Characters/" + modelName);
             Animator anim = null;
@@ -101,6 +103,16 @@ namespace PuebloLoco.Gameplay
                 if (ctrl != null) anim.runtimeAnimatorController = ctrl;
                 anim.applyRootMotion = false;
                 anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (!animLogged)
+                {
+                    animLogged = true;
+                    Debug.Log("[ANIM] " + modelName + " avatar=" + (anim.avatar != null)
+                        + " human=" + (anim.avatar != null && anim.avatar.isHuman)
+                        + " valid=" + (anim.avatar != null && anim.avatar.isValid)
+                        + " ctrl=" + (ctrl != null));
+                }
+#endif
             }
             else
             {

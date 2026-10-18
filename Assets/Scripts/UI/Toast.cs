@@ -23,8 +23,7 @@ namespace PuebloLoco.UI
 
         void Awake()
         {
-            instance = this;
-            var canvas = gameObject.AddComponent<Canvas>();
+            instance = this;            var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 60;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -37,6 +36,11 @@ namespace PuebloLoco.UI
             label = HUD.CreateText("ToastLabel", panel, "", 24, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, new Vector2(10, 0));
             label.supportRichText = true;
+        }
+
+        void OnDestroy()
+        {
+            if (instance == this) instance = null;
         }
 
         void ShowInternal(string msg, float duration)

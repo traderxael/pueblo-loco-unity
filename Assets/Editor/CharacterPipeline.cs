@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -22,7 +22,11 @@ namespace PuebloLoco.EditorTools
             var mi = assetImporter as ModelImporter;
             if (mi == null) return;
 
-            mi.animationType = ModelImporterAnimationType.Generic;
+            // SK_* usan el rig Humanoid de Unity (22 huesos con nombres estándar);
+            // Villager/Kid/Elder siguen en Generic.
+            bool humanoid = path.Contains("SK_");
+            mi.animationType = humanoid ? ModelImporterAnimationType.Human : ModelImporterAnimationType.Generic;
+            if (humanoid) mi.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
             mi.importAnimation = true;
             mi.importBlendShapes = false;
             mi.animationCompression = ModelImporterAnimationCompression.Off;
@@ -154,15 +158,11 @@ namespace PuebloLoco.EditorTools
             }
             if (walk != null && run != null)
             {
+                // Umbral por debajo de VillagerAI.moveSpeed (1.15) o Run nunca se activaba.
                 var t = T(walk, run, 0.12f);
-                t.AddCondition(AnimatorConditionMode.Greater, 2.2f, "Speed");
+                t.AddCondition(AnimatorConditionMode.Greater, 0.85f, "Speed");
                 var t2 = T(run, walk, 0.15f);
-                t2.AddCondition(AnimatorConditionMode.Less, 2.2f, "Speed");
-            }
-            if (idle != null && run != null)
-            {
-                var t = T(run, idle, 0.15f);
-                t.AddCondition(AnimatorConditionMode.Less, 0.08f, "Speed");
+                t2.AddCondition(AnimatorConditionMode.Less, 0.85f, "Speed");
             }
             if (walk != null && work != null)
             {
