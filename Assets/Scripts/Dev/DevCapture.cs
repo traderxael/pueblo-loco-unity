@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using PuebloLoco.Core;
@@ -7,7 +7,7 @@ using PuebloLoco.Gameplay;
 namespace PuebloLoco.Dev
 {
     /// <summary>
-    /// Modo captura para verificar el juego sin interacciÃ³n:
+    /// Modo captura para verificar el juego sin interacción:
     /// arma un pueblo de ejemplo, deja a los vecinos animados y guarda PNGs.
     /// Uso: PuebloLoco.exe -shotdir "ruta"
     /// </summary>
@@ -171,8 +171,7 @@ namespace PuebloLoco.Dev
                     iso.FocusOn(new Vector3(0f, 0f, 0f));
                     iso.SetDistance(11.5f);
                 }
-            }
-            Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);
+            }            Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);
         }
     }
 }

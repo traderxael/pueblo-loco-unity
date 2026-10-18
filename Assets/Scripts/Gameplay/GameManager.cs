@@ -13,6 +13,9 @@ namespace PuebloLoco.Gameplay
         public long NowMs => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         public event Action OnStateChanged;
+        /// <summary>Solo cuando cambia la grilla (construir, adorno, ampliar). Evita
+        /// reconstruir el pueblo entero al cobrar monedas o completar tareas.</summary>
+        public event Action OnTownChanged;
         public event Action<List<GameEvent>> OnGameEvents;
 
         void Awake()
@@ -51,6 +54,7 @@ namespace PuebloLoco.Gameplay
         public void NotifyChanged()
         {
             OnStateChanged?.Invoke();
+            OnTownChanged?.Invoke();
         }
 
         public ActionResult PlaceBuilding(string defId, int x, int y)
@@ -59,6 +63,7 @@ namespace PuebloLoco.Gameplay
             if (r.ok)
             {
                 OnStateChanged?.Invoke();
+                OnTownChanged?.Invoke();
                 if (r.events != null && r.events.Count > 0) OnGameEvents?.Invoke(r.events);
                 Save();
             }
@@ -134,6 +139,20 @@ namespace PuebloLoco.Gameplay
             if (r.ok)
             {
                 OnStateChanged?.Invoke();
+                OnTownChanged?.Invoke();
+                Save();
+            }
+            return r;
+        }
+
+        public ActionResult BuyDecor(string defId)
+        {
+            var r = Economy.BuyDecor(State, defId, NowMs);
+            if (r.ok)
+            {
+                OnStateChanged?.Invoke();
+                OnTownChanged?.Invoke();
+                if (r.events != null && r.events.Count > 0) OnGameEvents?.Invoke(r.events);
                 Save();
             }
             return r;

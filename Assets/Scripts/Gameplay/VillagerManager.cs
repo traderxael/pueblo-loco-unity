@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using PuebloLoco.Core;
 
@@ -7,7 +7,7 @@ namespace PuebloLoco.Gameplay
     /// <summary>
     /// Crea y mantiene un vecino animado por cada personaje desbloqueado.
     /// Usa los modelos con esqueleto generados en Blender (Villager/Kid/Elder)
-    /// y les pinta la ropa/pelo segÃºn el catÃ¡logo.
+    /// y les pinta la ropa/pelo según el catálogo.
     /// </summary>
     public class VillagerManager : MonoBehaviour
     {

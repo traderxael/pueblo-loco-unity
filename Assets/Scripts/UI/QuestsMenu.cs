@@ -11,6 +11,7 @@ namespace PuebloLoco.UI
         GameObject panel;
         bool visible;
         RectTransform listContent;
+        float refreshTimer;
 
         void Awake()
         {
@@ -67,9 +68,19 @@ namespace PuebloLoco.UI
             GameManager.Instance.OnStateChanged += Refresh;
         }
 
+        void OnDestroy()
+        {
+            if (GameManager.Instance != null) GameManager.Instance.OnStateChanged -= Refresh;
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
-            if (visible) Refresh();
+            if (!visible) return;
+            refreshTimer += Time.deltaTime;
+            if (refreshTimer < 0.5f) return;
+            refreshTimer = 0f;
+            Refresh();
         }
 
         public void Toggle()
@@ -79,6 +90,7 @@ namespace PuebloLoco.UI
             if (visible)
             {
                 TutorialManager.Ensure()?.SignalQuests();
+                refreshTimer = 0f;
                 Refresh();
             }
         }

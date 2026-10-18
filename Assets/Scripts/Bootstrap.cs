@@ -62,6 +62,8 @@ namespace PuebloLoco
                 new GameObject("FriendsMenu").AddComponent<FriendsMenu>();
             if (FindFirstObjectByType<QuestsMenu>() == null)
                 new GameObject("QuestsMenu").AddComponent<QuestsMenu>();
+            if (FindFirstObjectByType<DecorMenu>() == null)
+                new GameObject("DecorMenu").AddComponent<DecorMenu>();
             TutorialManager.Ensure();
 
             // Vecinos animados (modelos con esqueleto hechos en Blender)

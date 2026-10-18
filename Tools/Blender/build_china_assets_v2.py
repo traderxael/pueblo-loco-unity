@@ -267,6 +267,16 @@ def railing(name, w, d, z, mat="Lacquer"):
     return objs
 
 
+
+def uv_unwrap(obj, angle=66.0, margin=0.02):
+    """UV para que las texturas importadas en Unity se vean bien."""
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin)
+    bpy.ops.object.mode_set(mode="OBJECT")
 def export_static(path, obj):
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
@@ -355,7 +365,7 @@ def build_casa():
     for sx in (-1, 1):
         o += lantern("lant", sx * 0.75, -1.05, 1.45, 0.12)
         o += lion("lion", sx * 0.85, -1.25, 0.0)
-    body = join(o, "CasaHan")
+    body = join(o, "CasaHan"); uv_unwrap(body)
     preview("CasaHan", 4.4, 1.3)
     path = os.path.join(OUT, "SM_Building_CasaHan.fbx")
     export_static(path, body)
@@ -396,7 +406,7 @@ def build_pagoda():
         o.append(cyl("ring%d" % k, (0, 0, 5.55 + k * 0.12), 0.13 - k * 0.015, 0.13 - k * 0.015, 0.03, "Gold", 12))
     o.append(cyl("spire", (0, 0, 5.95), 0.035, 0.02, 0.55, "Gold", 8))
     o.append(ball("orb", (0, 0, 6.28), 0.07, "Gold", subdiv=2))
-    body = join(o, "Pagoda05")
+    body = join(o, "Pagoda05"); uv_unwrap(body)
     preview("Pagoda05", 8.0, 3.2)
     path = os.path.join(OUT, "SM_Building_Pagoda_05.fbx")
     export_static(path, body)
@@ -428,7 +438,7 @@ def build_paifang():
     for sx in (-1, 1):
         o += lantern("lant", sx * 1.05, 0, 2.30, 0.13)
         o += banner("band", sx * 1.55, -0.35, 1.65)
-    body = join(o, "Paifang")
+    body = join(o, "Paifang"); uv_unwrap(body)
     preview("Paifang", 6.2, 2.0)
     path = os.path.join(OUT, "SM_Building_Paifang.fbx")
     export_static(path, body)
@@ -461,7 +471,7 @@ def build_ding():
     for sx in (-1, 1):
         o.append(box("handle", (0.46 * sx, 0, 1.28), (0.10, 0.10, 0.30), "Bronze", rot_y=sx * 0.12))
         o.append(box("handleTop", (0.44 * sx, 0, 1.43), (0.22, 0.10, 0.08), "Bronze"))
-    body = join(o, "Ding")
+    body = join(o, "Ding"); uv_unwrap(body)
     preview("Ding", 2.4, 0.75)
     path = os.path.join(OUT, "SM_Prop_Ding.fbx")
     export_static(path, body)
@@ -478,7 +488,7 @@ def build_lantern():
     o.append(cyl("hook", (0.56, 0, 1.72), 0.02, 0.02, 0.10, "Gold", 6))
     o += lantern("lantern", 0.56, 0, 1.52, 0.19)
     o += banner("flag", 0.56, -0.20, 1.45, 0.20, 0.42)
-    body = join(o, "Lantern")
+    body = join(o, "Lantern"); uv_unwrap(body)
     preview("Lantern", 3.0, 1.1)
     path = os.path.join(OUT, "SM_Prop_Lantern.fbx")
     export_static(path, body)
@@ -738,7 +748,7 @@ def build_sabio():
                   "LeftLowerLeg" if sx > 0 else "RightLowerLeg"))
         p.append((box("boot." + side, (0.105 * sx, -0.05, 0.07), (0.13, 0.28, 0.14), "Boots"),
                   "LeftFoot" if sx > 0 else "RightFoot"))
-    rig, body = assemble("Sabio", p, "SabioRig")
+    rig, body = assemble("Sabio", p, "SabioRig"); uv_unwrap(body)
     acts = [anim_idle(rig), anim_walk(rig), anim_run(rig), anim_work(rig), anim_wave(rig),
             anim_bow(rig), anim_cheer(rig), anim_gather(rig)]
     rig.animation_data.action = acts[0]
@@ -793,7 +803,7 @@ def build_guardia():
     p.append((box("blade", (-0.235, 0, 2.17), (0.07, 0.02, 0.24), "Gold"), "RightHand"))
     p.append((ball("butt", (-0.235, 0, 0.07), 0.035, "Gold", subdiv=1), "RightHand"))
     p.append((box("tassel", (-0.235, 0, 2.02), (0.05, 0.05, 0.10), "Lacquer"), "RightHand"))
-    rig, body = assemble("Guardia", p, "GuardiaRig")
+    rig, body = assemble("Guardia", p, "GuardiaRig"); uv_unwrap(body)
     acts = [anim_idle(rig), anim_walk(rig), anim_run(rig), anim_work(rig), anim_wave(rig),
             anim_bow(rig), anim_cheer(rig), anim_gather(rig)]
     rig.animation_data.action = acts[0]
@@ -842,5 +852,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

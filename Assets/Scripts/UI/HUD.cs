@@ -7,7 +7,7 @@ namespace PuebloLoco.UI
 {
     public class HUD : MonoBehaviour
     {
-        Text coinsText, donasText, levelText, xpText, questText;
+        Text coinsText, donasText, levelText, questText, expandLabel;
         Image xpBar;
         Canvas canvas;
 
@@ -16,6 +16,11 @@ namespace PuebloLoco.UI
             Build();
             GameManager.Instance.OnStateChanged += Refresh;
             Refresh();
+        }
+
+        void OnDestroy()
+        {
+            if (GameManager.Instance != null) GameManager.Instance.OnStateChanged -= Refresh;
         }
 
         void Build()
@@ -37,7 +42,7 @@ namespace PuebloLoco.UI
             donasText = CreateText("Donas", topPanel.transform, "🍩 30", 28, TextAnchor.MiddleCenter,
                 new Vector2(0.3f, 0), new Vector2(0.6f, 1), Vector2.zero);
             levelText = CreateText("Level", topPanel.transform, "Nv 1", 28, TextAnchor.MiddleRight,
-                new Vector2(0.88f, 0), new Vector2(1, 1), new Vector2(0, -20));
+                new Vector2(0.88f, 0), new Vector2(1, 1), Vector2.zero);
 
             // barra de XP
             var xpBg = CreatePanel("XPBG", topPanel.transform, new Vector2(0.62f, 0.30f),
@@ -70,30 +75,64 @@ namespace PuebloLoco.UI
             var buildBtn = CreateButton("BuildBtn", transform, "🔨 Construir",
                 new Vector2(0, 0), new Vector2(0, 0), new Vector2(20, 20), new Vector2(200, 70),
                 new Color(0.2f, 0.5f, 0.9f));
-            buildBtn.onClick.AddListener(() => BuildMenu.Instance.Toggle());
+            buildBtn.onClick.AddListener(() => BuildMenu.Instance?.Toggle());
 
             // amigos
             var friendsBtn = CreateButton("FriendsBtn", transform, "🧑 Amigos",
                 new Vector2(0, 0), new Vector2(0, 0), new Vector2(230, 20), new Vector2(170, 70),
                 new Color(0.5f, 0.3f, 0.8f));
-            friendsBtn.onClick.AddListener(() => FriendsMenu.Instance.Toggle());
+            friendsBtn.onClick.AddListener(() => FriendsMenu.Instance?.Toggle());
 
             // misiones
             var questsBtn = CreateButton("QuestsBtn", transform, "📋 Misiones",
                 new Vector2(0, 0), new Vector2(0, 0), new Vector2(410, 20), new Vector2(170, 70),
                 new Color(0.8f, 0.6f, 0.1f));
-            questsBtn.onClick.AddListener(() => QuestsMenu.Instance.Toggle());
+            questsBtn.onClick.AddListener(() => QuestsMenu.Instance?.Toggle());
+
+            // adornos
+            var decorBtn = CreateButton("DecorBtn", transform, "🌿 Decorar",
+                new Vector2(0, 0), new Vector2(0, 0), new Vector2(600, 20), new Vector2(200, 70),
+                new Color(0.2f, 0.6f, 0.35f));
+            decorBtn.onClick.AddListener(() => DecorMenu.Instance?.Toggle());
+
+            // ampliar terreno
+            var expandBtn = CreateButton("ExpandBtn", transform, "⛏️ Ampliar terreno",
+                new Vector2(0, 0), new Vector2(0, 0), new Vector2(820, 20), new Vector2(300, 70),
+                new Color(0.45f, 0.4f, 0.2f));
+            expandLabel = expandBtn.GetComponentInChildren<Text>();
+            expandBtn.onClick.AddListener(() =>
+            {
+                if (GameManager.Instance == null) return;
+                var r = GameManager.Instance.ExpandLand();
+                if (r.ok) Toast.Show("⛏️ ¡Terreno ampliado!");
+                else Toast.Show("❌ " + r.reason);
+            });
+        }
+
+        void UpdateExpandLabel(GameState s)
+        {
+            if (expandLabel == null) return;
+            int next = s.landTier + 1;
+            if (next >= Catalog.LAND_TIERS.Length)
+            {
+                expandLabel.text = "⛏️ Terreno máximo";
+                return;
+            }
+            var tier = Catalog.LAND_TIERS[next];
+            expandLabel.text = $"⛏️ {tier.size}x{tier.size} ({tier.cost:N0} 🪙)";
         }
 
         void Refresh()
         {
+            if (GameManager.Instance == null) return;
             var s = GameManager.Instance.State;
+            if (s == null) return;
             coinsText.text = $"🪙 {s.coins:N0}";
             donasText.text = $"🍩 {s.donas:N0}";
             levelText.text = $"Nv {s.level}";
             int need = Economy.XpForLevel(s.level);
             xpBar.fillAmount = need > 0 ? (float)s.xp / need : 0;
-            xpText = xpText; // keep ref
+            UpdateExpandLabel(s);
             var q = Economy.ActiveQuest(s);
             questText.text = q != null ? $"📋 {q.name}\n<size=18>{q.story}</size>" : "🏆 ¡Misiones completadas!";
         }

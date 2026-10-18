@@ -11,6 +11,7 @@ namespace PuebloLoco.UI
         GameObject panel;
         bool visible;
         RectTransform listContent;
+        float refreshTimer;
 
         void Awake()
         {
@@ -70,16 +71,26 @@ namespace PuebloLoco.UI
             GameManager.Instance.OnStateChanged += Refresh;
         }
 
+        void OnDestroy()
+        {
+            if (GameManager.Instance != null) GameManager.Instance.OnStateChanged -= Refresh;
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
-            if (visible) Refresh();
+            if (!visible) return;
+            refreshTimer += Time.deltaTime;
+            if (refreshTimer < 0.5f) return;
+            refreshTimer = 0f;
+            Refresh();
         }
 
         public void Toggle()
         {
             visible = !visible;
             panel.SetActive(visible);
-            if (visible) Refresh();
+            if (visible) { refreshTimer = 0f; Refresh(); }
         }
 
         public void Hide() { visible = false; panel.SetActive(false); }
@@ -110,8 +121,7 @@ namespace PuebloLoco.UI
                 else
                 {
                     long remain = System.Math.Max(0, cs.task.endAt - GameManager.Instance.NowMs);
-                    var ts = System.TimeSpan.FromMilliseconds(remain);
-                    status = $"⏳ {ts.Minutes:00}:{ts.Seconds:00}";
+                    status = "⏳ " + FormatRemain(remain);
                 }
 
                 HUD.CreateText("Name", row.transform, $"{def.name}   {status}",
@@ -206,6 +216,15 @@ namespace PuebloLoco.UI
             if (sec >= 3600) return $"{sec / 3600}h";
             if (sec >= 60) return $"{sec / 60}m";
             return $"{sec}s";
+        }
+
+        /// <summary>Cuenta regresiva. TimeSpan.Minutes envuelve a los 60, así que
+        /// las tareas de varias horas necesitan el total de horas.</summary>
+        static string FormatRemain(long ms)
+        {
+            var ts = System.TimeSpan.FromMilliseconds(ms);
+            if (ts.TotalHours >= 1) return $"{(int)ts.TotalHours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
+            return $"{ts.Minutes:00}:{ts.Seconds:00}";
         }
     }
 }

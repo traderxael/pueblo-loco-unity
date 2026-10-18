@@ -314,7 +314,7 @@ namespace PuebloLoco.Core
         {
             int h = 0;
             for (int i = 0; i < s.Length; i++) h = (int)((h * 31L + s[i]) | 0);
-            return Math.Abs(h);
+            return h == int.MinValue ? int.MaxValue : Math.Abs(h);
         }
     }
 }

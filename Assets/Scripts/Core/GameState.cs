@@ -48,7 +48,7 @@ namespace PuebloLoco.Core
         public string date;
         public List<string> picked = new List<string>();
         public Stats stats = new Stats();
-        public Dictionary<string, bool> claimed = new Dictionary<string, bool>();
+        public List<string> claimed = new List<string>();
     }
 
     [Serializable]

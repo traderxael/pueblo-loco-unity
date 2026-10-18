@@ -78,6 +78,20 @@ A partir de la presentación sobre las dinastías Xia, Shang y Zhou hecha en **C
 
 ![Detalle en el juego](docs/china-detalle2.png)
 
+**Texturas CC0 y recursos libres**
+
+- Texturas PBR de **Poly Haven** (licencia **CC0**, uso libre sin atribución):
+  `grey_roof_tiles` (tejas), `clay_plaster` (muros de cal), `dark_wood` (madera) y
+  `cobblestone_01` (piedra). Descargadas en 1K; las `_nor` se importan como *NormalMap*.
+- Los modelos se exportan con **UV unwrap (smart project)** para que las texturas se vean bien.
+- `GridBuildSystem` asigna difusa + normal map por nombre de material
+  (roof / wood / stone / wall) y conserva los colores del catálogo como tinte sutil.
+- Fuentes de assets libres investigadas: [Poly Haven](https://polyhaven.com) (CC0),
+  [ambientCG](https://ambientcg.com) (CC0), [Kenney](https://kenney.nl) (CC0),
+  [Quaternius](https://quaternius.com) (CC0) y [OpenGameArt](https://opengameart.org).
+
+![Texturas en el juego](docs/china3-pueblo.png)
+
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que

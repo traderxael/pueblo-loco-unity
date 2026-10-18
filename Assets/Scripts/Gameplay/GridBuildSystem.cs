@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using PuebloLoco.Core;
 
@@ -8,19 +8,19 @@ namespace PuebloLoco.Gameplay
     {
         public static GridBuildSystem Instance { get; private set; }
 
-        [Header("Prefabs (se cargan de Resources si estÃ¡n vacÃ­os)")]
+        [Header("Prefabs (se cargan de Resources si están vacíos)")]
         public GameObject grassTilePrefab;
         public GameObject pathTilePrefab;
         public GameObject treePrefab;
-        public Dictionary<string, GameObject> buildingPrefabs = new Dictionary<string, GameObject>();
-        public Dictionary<string, GameObject> decorPrefabs = new Dictionary<string, GameObject>();
+        [System.NonSerialized] public Dictionary<string, GameObject> buildingPrefabs = new Dictionary<string, GameObject>();
+        [System.NonSerialized] public Dictionary<string, GameObject> decorPrefabs = new Dictionary<string, GameObject>();
 
         const float TILE = 1f;
         Transform tileRoot;
         Transform buildingRoot;
         readonly Dictionary<string, GameObject> placedViews = new Dictionary<string, GameObject>();
 
-        // modo colocaciÃ³n
+        // modo colocación
         string placingDef;
         GameObject ghost;
         bool placing;
@@ -35,8 +35,14 @@ namespace PuebloLoco.Gameplay
             tileRoot = new GameObject("Tiles").transform;
             buildingRoot = new GameObject("Buildings").transform;
             LoadPrefabs();
-            GameManager.Instance.OnStateChanged += RebuildAll;
+            GameManager.Instance.OnTownChanged += RebuildAll;
             RebuildAll();
+        }
+
+        void OnDestroy()
+        {
+            if (GameManager.Instance != null) GameManager.Instance.OnTownChanged -= RebuildAll;
+            if (Instance == this) Instance = null;
         }
 
         void LoadPrefabs()
@@ -45,7 +51,7 @@ namespace PuebloLoco.Gameplay
             if (pathTilePrefab == null) pathTilePrefab = Resources.Load<GameObject>("PathTile");
             if (treePrefab == null) treePrefab = Resources.Load<GameObject>("Tree");
 
-            // OJO: los FBX en Resources empiezan con mayÃºscula (Casa.fbx).
+            // OJO: los FBX en Resources empiezan con mayúscula (Casa.fbx).
             var map = new Dictionary<string, string>
             {
                 { "casa", "Casa" },
@@ -59,7 +65,7 @@ namespace PuebloLoco.Gameplay
                 else Debug.LogWarning("[BUILDING] falta Resources/" + kv.Value + ".fbx");
             }
 
-            // edificios y adornos temÃ¡ticos de la China antigua
+            // edificios y adornos temáticos de la China antigua
             var chinaBuildings = new Dictionary<string, string>
             {
                 { "casahan", "China/SM_Building_CasaHan" },
@@ -118,13 +124,13 @@ namespace PuebloLoco.Gameplay
                 {
                     var prefab = grassTilePrefab;
                     if (prefab == null) continue;
-                    // OJO: conservar la rotaciÃ³n del prefab (los FBX vienen con -90Â° en X)
+                    // OJO: conservar la rotación del prefab (los FBX vienen con -90° en X)
                     var go = Instantiate(prefab, tileRoot);
                     go.transform.localPosition = GridToWorld(x, y);
                     go.name = $"Tile_{x}_{y}";
                 }
 
-            // Ã¡rboles decorativos en bordes
+            // árboles decorativos en bordes
             if (treePrefab != null)
             {
                 for (int i = 0; i < size; i += 2)
@@ -150,7 +156,7 @@ namespace PuebloLoco.Gameplay
                 placedViews[b.id] = go;
             }
 
-            // adornos temÃ¡ticos
+            // adornos temáticos
             foreach (var d in s.decor)
             {
                 var def = Catalog.Decor(d.def);
@@ -185,7 +191,68 @@ namespace PuebloLoco.Gameplay
             go.transform.localScale = Vector3.one * 0.8f;
         }
 
-        /// <summary>Pinta el edificio con los colores del catÃ¡logo y la paleta china.</summary>
+        // ------------------------------------------------------------------
+        // materiales: colores + texturas CC0 (Poly Haven) para China
+        // ------------------------------------------------------------------
+        static readonly Dictionary<string, Texture2D> texCache = new Dictionary<string, Texture2D>();
+
+        static Texture2D Tex(string name)
+        {
+            if (texCache.TryGetValue(name, out var t)) return t;
+            t = Resources.Load<Texture2D>("Textures/China/" + name);
+            texCache[name] = t;
+            return t;
+        }
+
+        static void TexFor(string n, out Texture2D diff, out Texture2D norm, out Vector2 tiling)
+        {
+            string ln = n.ToLowerInvariant();
+            diff = null; norm = null; tiling = Vector2.one;
+            if (ln.Contains("roof") || ln.Contains("tile") || ln.Contains("awning"))
+            {
+                diff = Tex("tex_roof_diff"); norm = Tex("tex_roof_nor"); tiling = new Vector2(2f, 2f);
+            }
+            else if (ln.Contains("stone"))
+            {
+                diff = Tex("tex_stone_diff"); norm = Tex("tex_stone_nor"); tiling = new Vector2(1.5f, 1.5f);
+            }
+            else if (ln.Contains("wood") || ln.Contains("door") || ln.Contains("window"))
+            {
+                diff = Tex("tex_wood_diff"); norm = Tex("tex_wood_nor"); tiling = new Vector2(2f, 2f);
+            }
+            else if (ln.Contains("wall") || ln.Contains("plaster") || ln.Contains("paper") || ln.Contains("lime"))
+            {
+                diff = Tex("tex_plaster_diff"); norm = Tex("tex_plaster_nor"); tiling = new Vector2(2.5f, 2.5f);
+            }
+        }
+
+        /// <summary>Material Standard: con textura si el nombre lo indica, si no color plano.</summary>
+        Material MakeMaterial(string name, Color tint)
+        {
+            var m = new Material(Shader.Find("Standard"));
+            m.name = name;
+            TexFor(name, out var diff, out var norm, out var tiling);
+            if (diff != null)
+            {
+                m.mainTexture = diff;
+                m.mainTextureScale = tiling;
+                m.color = Color.Lerp(Color.white, tint, 0.35f);
+                if (norm != null)
+                {
+                    m.SetTexture("_BumpMap", norm);
+                    m.SetFloat("_BumpScale", 0.6f);
+                    m.EnableKeyword("_NORMALMAP");
+                }
+            }
+            else
+            {
+                m.color = tint;
+            }
+            m.SetFloat("_Glossiness", 0.12f);
+            return m;
+        }
+
+        /// <summary>Pinta el edificio con los colores del catálogo y la paleta china.</summary>
         void TintBuilding(GameObject go, BuildingDef def)
         {
             Color wall, roof;
@@ -211,11 +278,7 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("bronze")) c = new Color(0.33f, 0.47f, 0.38f);
                     else c = wall;
 
-                    var m = new Material(Shader.Find("Standard"));
-                    m.name = mats[i] != null ? mats[i].name : "bmat";
-                    m.color = c;
-                    m.SetFloat("_Glossiness", 0.12f);
-                    mats[i] = m;
+                    mats[i] = MakeMaterial(mats[i] != null ? mats[i].name : "bmat", c);
                 }
                 r.sharedMaterials = mats;
             }
@@ -241,11 +304,7 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("wall")) c = tintB ?? new Color(0.82f, 0.62f, 0.38f);
                     else continue;
 
-                    var m = new Material(Shader.Find("Standard"));
-                    m.name = mats[i] != null ? mats[i].name : "dmat";
-                    m.color = c;
-                    m.SetFloat("_Glossiness", 0.12f);
-                    mats[i] = m;
+                    mats[i] = MakeMaterial(mats[i] != null ? mats[i].name : "dmat", c);
                 }
                 r.sharedMaterials = mats;
             }
@@ -271,7 +330,7 @@ namespace PuebloLoco.Gameplay
             return go;
         }
 
-        /* ------------------------------------------------ modo colocaciÃ³n */
+        /* ------------------------------------------------ modo colocación */
 
         public void BeginPlacing(string defId)
         {
@@ -333,6 +392,7 @@ namespace PuebloLoco.Gameplay
         }
     }
 }
+
 
 
 

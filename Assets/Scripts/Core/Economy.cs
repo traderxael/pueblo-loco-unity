@@ -100,7 +100,7 @@ namespace PuebloLoco.Core
             s.xp += amount;
             int gained = 0;
             while (s.xp >= XpForLevel(s.level)) { s.xp -= XpForLevel(s.level); s.level++; gained++; }
-            if (gained > 0) s.stats.levelsGained += gained;
+            if (gained > 0) { s.stats.levelsGained += gained; BumpDaily(s, "levelsGained", gained); }
             return gained;
         }
 
@@ -147,6 +147,7 @@ namespace PuebloLoco.Core
                 s.daily = new DailyState { date = key };
                 foreach (var d in PickDaily(key)) s.daily.picked.Add(d.id);
             }
+            if (s.daily.claimed == null) s.daily.claimed = new List<string>();
         }
 
         public static void UpdateWeekly(GameState s, long now)
@@ -185,7 +186,7 @@ namespace PuebloLoco.Core
                 {
                     def = d, progress = cur, goal = d.goal,
                     done = cur >= d.goal,
-                    claimed = s.daily.claimed.ContainsKey(id) && s.daily.claimed[id]
+                    claimed = s.daily.claimed != null && s.daily.claimed.Contains(id)
                 });
             }
             return result;
@@ -215,11 +216,11 @@ namespace PuebloLoco.Core
         public static ActionResult ClaimDaily(GameState s, string id, long now)
         {
             UpdateDaily(s, now);
-            if (s.daily.claimed.ContainsKey(id) && s.daily.claimed[id]) return ActionResult.Fail("Ya reclamada");
+            if (s.daily.claimed.Contains(id)) return ActionResult.Fail("Ya reclamada");
             var d = Catalog.Daily(id);
             if (d == null || !s.daily.picked.Contains(id)) return ActionResult.Fail("No es una misión de hoy");
             if (GetDailyStat(s, d.stat) < d.goal) return ActionResult.Fail("Aún no completada");
-            s.daily.claimed[id] = true;
+            s.daily.claimed.Add(id);
             int pay = (int)Math.Floor(d.donas * EventMult(s, "daily"));
             s.donas += pay;
             var r = ActionResult.Success();
@@ -396,6 +397,7 @@ namespace PuebloLoco.Core
             if (entry == null || entry.task == null) return ActionResult.Fail("Sin tarea");
             if (!entry.task.done && now < entry.task.endAt) return ActionResult.Fail("La tarea aún no termina");
             var t = Catalog.Character(charDefId)?.Task(entry.task.taskId);
+            if (t == null) { entry.task = null; return ActionResult.Fail("Tarea desconocida"); }
             int pay = (int)Math.Floor(t.coins * EventMult(s, "task"));
             s.coins += pay;
             s.stats.coinsEarned += pay;
@@ -421,10 +423,12 @@ namespace PuebloLoco.Core
 
         public static ActionResult RushTask(GameState s, string charDefId, long now)
         {
+            var entry = s.characters.Find(c => c.def == charDefId);
+            if (entry == null) return ActionResult.Fail("Personaje no disponible");
+            if (entry.task == null) return ActionResult.Fail("Sin tarea");
             int cost = RushCost(s, charDefId, now);
             if (s.donas < cost) return ActionResult.Fail("Donas insuficientes");
             s.donas -= cost;
-            var entry = s.characters.Find(c => c.def == charDefId);
             entry.task.done = true;
             entry.task.endAt = now;
             return CompleteTask(s, charDefId, now);
@@ -454,7 +458,7 @@ namespace PuebloLoco.Core
         public static QuestDef ActiveQuest(GameState s) =>
             s.questIndex < Catalog.QUESTS.Length ? Catalog.QUESTS[s.questIndex] : null;
 
-        static bool ObjectiveDone(GameState s, QuestObjective o) => o.type switch
+        public static bool ObjectiveDone(GameState s, QuestObjective o) => o.type switch
         {
             "build" => s.buildings.Any(b => b.def == o.def),
             "unlock" => s.characters.Any(c => c.def == o.def && c.unlocked),
