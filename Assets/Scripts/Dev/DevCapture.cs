@@ -102,7 +102,7 @@ namespace PuebloLoco.Dev
             var s = gm.State;
             s.coins = 250000;
             s.level = 12;
-            s.landTier = 1; // terreno 8x8
+            s.landTier = 2; // terreno 10x10
             foreach (var c in s.characters) c.unlocked = true;
 
             s.buildings.Clear();
@@ -110,7 +110,8 @@ namespace PuebloLoco.Dev
             {
                 ("casa", 0, 0), ("kiosco", 2, 1), ("panaderia", 4, 0),
                 ("casahan", 1, 2), ("pagoda", 3, 3), ("mercado", 0, 5),
-                ("templo", 4, 5), ("muralla", 6, 2)
+                ("templo", 4, 5), ("muralla", 6, 2), ("herreria", 6, 0),
+                ("granja", 2, 6), ("posada", 6, 5), ("campanario", 0, 3)
             };
             foreach (var l in layout)
             {
@@ -151,6 +152,10 @@ namespace PuebloLoco.Dev
             if (sabio != null) sabio.task = new ActiveTask { taskId = "estudiar", endAt = gm.NowMs + 300000, done = false };
             var guardia = s.characters.Find(c => c.def == "guardia");
             if (guardia != null) guardia.task = new ActiveTask { taskId = "patrullar", endAt = gm.NowMs + 300000, done = false };
+            var comerciante = s.characters.Find(c => c.def == "comerciante");
+            if (comerciante != null) comerciante.task = new ActiveTask { taskId = "vender", endAt = gm.NowMs + 300000, done = false };
+            var campesino = s.characters.Find(c => c.def == "campesino");
+            if (campesino != null) campesino.task = new ActiveTask { taskId = "sembrar", endAt = gm.NowMs + 300000, done = false };
 
             gm.NotifyChanged();
             if (VillagerManager.Instance != null)
@@ -168,7 +173,7 @@ namespace PuebloLoco.Dev
                 if (iso != null)
                 {
                     iso.FocusOn(new Vector3(0f, 0f, 0f));
-                    iso.SetDistance(11.5f);
+                    iso.SetDistance(13.5f);
                 }
             }            Debug.Log("[CAPTURE] pueblo sembrado: edificios=" + s.buildings.Count + " personajes=" + s.characters.Count);
         }

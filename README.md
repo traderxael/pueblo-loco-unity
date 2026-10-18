@@ -123,6 +123,37 @@ A partir de la presentación sobre las dinastías Xia, Shang y Zhou hecha en **C
 
 ![Detalle en el juego](docs/china4-detalle.png)
 
+### Contenido adicional (v4): más edificios y vecinos
+
+Generado con `Tools/Blender/build_china_assets_v3.py` (reutiliza los helpers de la v2):
+
+| Asset | En el juego | Detalle |
+|---|---|---|
+| `SM_Building_Blacksmith` | **Herrería** (2.200) | Fragua con **brasas emisivas**, chimenea, yunque, herramientas |
+| `SM_Building_Farm` | **Granja de Arroz** (1.100) | Terrazas con agua, hileras de arroz, cabaña de paja y cerco |
+| `SM_Building_Inn` | **Posada** (4.000) | Dos plantas, balcón con baranda, cartel y faroles |
+| `SM_Building_BellTower` | **Campanario** (7.000) | Campana de bronce, vigas y techo curvo |
+| `SM_Prop_Well` | decoración | Pozo de piedra con techo de paja y balde |
+| `SK_Merchant` | **Comerciante Wen** (15 donas) | Túnica, delantal, sombrero y bolsa; tareas "Atender el mercado" / "Negociar" |
+| `SK_Farmer` | **Campesino Li** (15 donas) | Sombrero de paja y caña con cestas; tareas "Sembrar arroz" / "Cosechar" |
+
+- Total del paquete: **17 assets** (10 modelos de arquitectura/props + 4 personajes
+  Humanoid + 3 personajes Generic), inventariados en `docs/assets-china-index.json`.
+- Las brasas de la fragua usan **emisión** (`_EMISSION`) en Unity para que brillen.
+- Los vecinos nuevos aparecen solos en partidas viejas (`EnsureCharacters`).
+
+![Aldea con contenido adicional](docs/china5-pueblo.png)
+
+| Herrería | Granja | Posada | Campanario |
+|---|---|---|---|
+| ![Herrería](docs/china5-herreria.png) | ![Granja](docs/china5-granja.png) | ![Posada](docs/china5-posada.png) | ![Campanario](docs/china5-campanario.png) |
+
+| Pozo | Comerciante Wen | Campesino Li |
+|---|---|---|
+| ![Pozo](docs/china5-pozo.png) | ![Comerciante](docs/china5-comerciante.png) | ![Campesino](docs/china5-campesino.png) |
+
+![Detalle en el juego](docs/china5-detalle.png)
+
 ### Correcciones del proyecto original
 
 - **Terreno y edificios acostados**: los FBX traen una rotación de -90° en la raíz que

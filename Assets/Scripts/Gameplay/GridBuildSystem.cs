@@ -79,6 +79,10 @@ namespace PuebloLoco.Gameplay
                 { "mercado", "China/SM_Building_Market" },
                 { "muralla", "China/SM_Building_Wall" },
                 { "templo", "China/SM_Building_Temple" },
+                { "herreria", "China/SM_Building_Blacksmith" },
+                { "granja", "China/SM_Building_Farm" },
+                { "posada", "China/SM_Building_Inn" },
+                { "campanario", "China/SM_Building_BellTower" },
             };
             foreach (var kv in chinaBuildings)
             {
@@ -268,6 +272,12 @@ namespace PuebloLoco.Gameplay
             {
                 m.color = tint;
             }
+            if (name.ToLowerInvariant().Contains("ember"))
+            {
+                m.EnableKeyword("_EMISSION");
+                m.SetColor("_EmissionColor", new Color(1f, 0.42f, 0.10f) * 2.2f);
+                m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            }
             m.SetFloat("_Glossiness", 0.12f);
             return m;
         }
@@ -296,6 +306,11 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("gold")) c = new Color(0.85f, 0.65f, 0.18f);
                     else if (n.Contains("red")) c = new Color(0.62f, 0.12f, 0.10f);
                     else if (n.Contains("bronze")) c = new Color(0.33f, 0.47f, 0.38f);
+                    else if (n.Contains("water")) c = new Color(0.12f, 0.30f, 0.34f);
+                    else if (n.Contains("rice")) c = new Color(0.42f, 0.62f, 0.20f);
+                    else if (n.Contains("thatch") || n.Contains("straw")) c = new Color(0.80f, 0.70f, 0.42f);
+                    else if (n.Contains("terracotta")) c = new Color(0.66f, 0.33f, 0.20f);
+                    else if (n.Contains("ember")) c = new Color(1f, 0.42f, 0.10f);
                     else c = wall;
 
                     mats[i] = MakeMaterial(mats[i] != null ? mats[i].name : "bmat", c);
@@ -322,6 +337,8 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("stone")) c = tintB ?? new Color(0.46f, 0.45f, 0.42f);
                     else if (n.Contains("wood")) c = tintB ?? new Color(0.34f, 0.19f, 0.10f);
                     else if (n.Contains("wall")) c = tintB ?? new Color(0.82f, 0.62f, 0.38f);
+                    else if (n.Contains("water")) c = new Color(0.12f, 0.30f, 0.34f);
+                    else if (n.Contains("thatch") || n.Contains("straw")) c = new Color(0.80f, 0.70f, 0.42f);
                     else continue;
 
                     mats[i] = MakeMaterial(mats[i] != null ? mats[i].name : "dmat", c);
@@ -340,6 +357,10 @@ namespace PuebloLoco.Gameplay
                 case "mercado": return 0.34f;
                 case "muralla": return 0.30f;
                 case "templo": return 0.30f;
+                case "herreria": return 0.48f;
+                case "granja": return 0.55f;
+                case "posada": return 0.36f;
+                case "campanario": return 0.40f;
                 default: return 1f;
             }
         }

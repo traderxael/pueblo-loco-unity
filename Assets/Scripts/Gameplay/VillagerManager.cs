@@ -76,6 +76,8 @@ namespace PuebloLoco.Gameplay
                 case "ramon": modelName = "Elder"; scale = 0.50f; break;
                 case "sabio": modelName = "SK_Sabio"; scale = 0.55f; break;
                 case "guardia": modelName = "SK_Guardia"; scale = 0.56f; break;
+                case "comerciante": modelName = "SK_Merchant"; scale = 0.55f; break;
+                case "campesino": modelName = "SK_Farmer"; scale = 0.55f; break;
                 default: modelName = "Villager"; scale = 0.55f; break;
             }
 
@@ -170,6 +172,8 @@ namespace PuebloLoco.Gameplay
                     else if (n.Contains("hair")) c = hair;
                     else if (n.Contains("shoes") || n.Contains("boots")) c = shoes;
                     else if (n.Contains("armor")) c = Color.Lerp(shirt, new Color(0.32f, 0.22f, 0.06f), 0.45f);
+                    else if (n.Contains("straw") || n.Contains("thatch")) c = new Color(0.80f, 0.70f, 0.42f);
+                    else if (n.Contains("lime") || n.Contains("apron")) c = new Color(0.92f, 0.88f, 0.78f);
                     else if (n.Contains("trim") || n.Contains("gold")) c = new Color(0.85f, 0.65f, 0.18f);
                     else continue;
 

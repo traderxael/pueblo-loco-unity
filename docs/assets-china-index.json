@@ -1,5 +1,5 @@
 {
-  "asset_count": 10,
+  "asset_count": 17,
   "units": "metros (1 u = 1 m)",
   "axis": "Blender Z-up, frente -Y; FBX export Forward -Z / Up Y",
   "palette": {
@@ -110,6 +110,97 @@
       "name": "SK_Guardia",
       "file": "SK_Guardia.fbx",
       "tris": 1036,
+      "bones": 22,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work",
+        "Wave",
+        "Bow",
+        "Cheer",
+        "Gather"
+      ],
+      "loops": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "SM_Building_Blacksmith",
+      "file": "SM_Building_Blacksmith.fbx",
+      "tris": 958,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Building_Farm",
+      "file": "SM_Building_Farm.fbx",
+      "tris": 482,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Building_Inn",
+      "file": "SM_Building_Inn.fbx",
+      "tris": 1570,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Building_BellTower",
+      "file": "SM_Building_BellTower.fbx",
+      "tris": 858,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "building"
+    },
+    {
+      "name": "SM_Prop_Well",
+      "file": "SM_Prop_Well.fbx",
+      "tris": 232,
+      "bones": 0,
+      "animations": [],
+      "loops": [],
+      "kind": "prop"
+    },
+    {
+      "name": "SK_Merchant",
+      "file": "SK_Merchant.fbx",
+      "tris": 1000,
+      "bones": 22,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work",
+        "Wave",
+        "Bow",
+        "Cheer",
+        "Gather"
+      ],
+      "loops": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Work"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "SK_Farmer",
+      "file": "SK_Farmer.fbx",
+      "tris": 956,
       "bones": 22,
       "animations": [
         "Idle",

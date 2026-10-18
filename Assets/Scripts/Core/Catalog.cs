@@ -172,12 +172,16 @@ namespace PuebloLoco.Core
             new BuildingDef("mercado",   "Mercado del Barrio",1500,  2, 120,  55,   35,  3,  "#e8b04b", "#b03a2e", "market"),
             new BuildingDef("muralla",   "Muralla",           2500,  2, 150,  45,   45,  4,  "#8d8d8d", "#5d4037", "wall"),
             new BuildingDef("templo",    "Templo Taoísta",    9000,  2, 360,  260,  90,  6,  "#c0392b", "#1e8449", "temple"),
+            new BuildingDef("granja",    "Granja de Arroz",   1100,  2, 90,   40,   30,  3,  "#8bc34a", "#689f38", "farm"),
+            new BuildingDef("herreria",  "Herrería",          2200,  1, 150,  70,   45,  4,  "#6d4c41", "#37474f", "shop"),
+            new BuildingDef("posada",    "Posada",            4000,  2, 240,  120,  60,  5,  "#ffcc80", "#8d6e63", "inn"),
+            new BuildingDef("campanario","Campanario",        7000,  1, 300,  180,  75,  7,  "#b71c1c", "#37474f", "tower"),
             new BuildingDef("escuela",   "Escuela",           35000, 2, 600,  520,  120, 6,  "#f9e79f", "#b7950b", "school"),
             new BuildingDef("hospital",  "Hospital",          80000, 3, 720,  960,  180, 8,  "#ffffff", "#c0392b", "hospital"),
             new BuildingDef("comisaria", "Comisaría",         150000,2, 900,  1500, 250, 10, "#aed6f1", "#1a5276", "office"),
             new BuildingDef("estadio",   "Estadio",           400000,3, 1200, 3200, 400, 12, "#abebc6", "#148f77", "stadium"),
-            new BuildingDef("torre",     "Torre de Oficinas", 900000,2, 1800, 6000, 600, 14, "#d5dbdb", "#2e4053", "tower"),
-        };
+            new BuildingDef("torre",     "Torre de Oficinas", 900000,2, 1800, 6000, 600, 14, "#d5dbdb", "#2e4053", "tower"), };
+
 
         public static readonly CharacterDef[] CHARACTERS =
         {
@@ -212,7 +216,13 @@ namespace PuebloLoco.Core
             new CharacterDef("guardia","Guardia Wu", 25, "#b9770e", "#17202a",
                 new TaskDef("patrullar","Patrullar el pueblo",   1200,  260,  55),
                 new TaskDef("entrenar", "Entrenar con la lanza", 2400,  520,  100)),
-        };
+
+            new CharacterDef("comerciante", "Comerciante Wen", 15, "#16a085", "#3e2723",
+                new TaskDef("vender",   "Atender el mercado",      1500,  240,  55),
+                new TaskDef("negociar", "Negociar con mercaderes", 3600,  700,  140)),
+            new CharacterDef("campesino", "Campesino Li", 15, "#8d6e63", "#4e342e",
+                new TaskDef("sembrar",  "Sembrar arroz",           2400,  380,  80),
+                new TaskDef("cosechar", "Cosechar la cosecha",     5400,  980,  190)),        };
 
         public static readonly DecorDef[] DECOR =
         {
