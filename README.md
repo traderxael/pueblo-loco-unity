@@ -250,6 +250,22 @@ Encastra en la grilla de decor (1x1) para unir edificios con la pagoda.
 - El carrito conserva sus 3 texturas originales (cuerpo, techo y ruedas).
 - Las escalas se calibraron con una sonda del ModelImporter (el .blend del dragon
   venia normalizado a 0.55 u; con escala 0.10 quedaba invisible de 5 cm).
+
+### UI estilo city-builder (v9)
+
+Rediseño de la interfaz al patron de los juegos de economia y administracion
+de ciudad (Frostpunk / Cities: Skylines / Anno):
+
+- **Barra de acciones inferior centrada**: Recolectar, Construir, Decorar,
+  Amigos, Misiones y Ampliar terreno como botones uniformes (140-220 px)
+  sobre una franja oscura translucida. Antes estaban apilados con offsets
+  absolutos en la esquina inferior izquierda.
+- **Boton de terreno compacto**: formato de costo tipo city-builder
+  (`14x14 . 1.8M` en vez de `(1.800.000)`).
+- **Construir y Decorar como gavetas inferiores**: panel de ancho completo
+  (100-560 px sobre la barra) con **grilla de tarjetas** de 330x84 en vez
+  de lista lateral. Los 21 edificios quedan en 5 columnas con scroll.
+- Recursos (monedas, donas, nivel + barra XP) permanecen en la franja superior.
 ## Cómo jugar
 
 | Acción | Control |

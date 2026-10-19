@@ -61,52 +61,59 @@ namespace PuebloLoco.UI
             qrt.offsetMax = new Vector2(-20f, -92f);
             questText.color = new Color(1, 1, 0.8f);
 
-            // botón recolectar todo
-            var collectBtn = CreateButton("CollectAllBtn", transform, "💰 Recolectar todo",
-                new Vector2(0.5f, 0), new Vector2(1, 0), new Vector2(-20, 20), new Vector2(250, 70),
-                new Color(0.2f, 0.7f, 0.3f));
-            collectBtn.onClick.AddListener(() =>
+            // ── barra de acciones inferior, centrada (estilo city-builder) ──
+            var actionBar = CreatePanel("ActionBar", transform,
+                new Vector2(0.5f, 0), new Vector2(0.5f, 0),
+                new Vector2(-560, 10), new Vector2(560, 94), new Color(0, 0, 0, 0.55f));
+
+            var btnDefs = new (string name, string label, Color c, float w)[]
             {
-                var r = GameManager.Instance.CollectAll();
-                if (r.ok) TutorialManager.Ensure()?.SignalCollect();
-            });
-
-            // menú construcción
-            var buildBtn = CreateButton("BuildBtn", transform, "🔨 Construir",
-                new Vector2(0, 0), new Vector2(0, 0), new Vector2(20, 20), new Vector2(200, 70),
-                new Color(0.2f, 0.5f, 0.9f));
-            buildBtn.onClick.AddListener(() => BuildMenu.Instance?.Toggle());
-
-            // amigos
-            var friendsBtn = CreateButton("FriendsBtn", transform, "🧑 Amigos",
-                new Vector2(0, 0), new Vector2(0, 0), new Vector2(230, 20), new Vector2(170, 70),
-                new Color(0.5f, 0.3f, 0.8f));
-            friendsBtn.onClick.AddListener(() => FriendsMenu.Instance?.Toggle());
-
-            // misiones
-            var questsBtn = CreateButton("QuestsBtn", transform, "📋 Misiones",
-                new Vector2(0, 0), new Vector2(0, 0), new Vector2(410, 20), new Vector2(170, 70),
-                new Color(0.8f, 0.6f, 0.1f));
-            questsBtn.onClick.AddListener(() => QuestsMenu.Instance?.Toggle());
-
-            // adornos
-            var decorBtn = CreateButton("DecorBtn", transform, "🌿 Decorar",
-                new Vector2(0, 0), new Vector2(0, 0), new Vector2(600, 20), new Vector2(200, 70),
-                new Color(0.2f, 0.6f, 0.35f));
-            decorBtn.onClick.AddListener(() => DecorMenu.Instance?.Toggle());
-
-            // ampliar terreno
-            var expandBtn = CreateButton("ExpandBtn", transform, "⛏️ Ampliar terreno",
-                new Vector2(0, 0), new Vector2(0, 0), new Vector2(820, 20), new Vector2(300, 70),
-                new Color(0.45f, 0.4f, 0.2f));
-            expandLabel = expandBtn.GetComponentInChildren<Text>();
-            expandBtn.onClick.AddListener(() =>
+                ("CollectAllBtn", "💰 Recolectar", new Color(0.2f, 0.7f, 0.3f), 180f),
+                ("BuildBtn",      "🔨 Construir",  new Color(0.2f, 0.5f, 0.9f), 160f),
+                ("DecorBtn",      "🌿 Decorar",    new Color(0.2f, 0.6f, 0.35f), 150f),
+                ("FriendsBtn",    "🧑 Amigos",     new Color(0.5f, 0.3f, 0.8f), 140f),
+                ("QuestsBtn",     "📋 Misiones",   new Color(0.8f, 0.6f, 0.1f), 150f),
+                ("ExpandBtn",     "⛏️ Ampliar",    new Color(0.45f, 0.4f, 0.2f), 220f),
+            };
+            float bx = 12f;
+            foreach (var d in btnDefs)
             {
-                if (GameManager.Instance == null) return;
-                var r = GameManager.Instance.ExpandLand();
-                if (r.ok) Toast.Show("⛏️ ¡Terreno ampliado!");
-                else Toast.Show("❌ " + r.reason);
-            });
+                var b = CreateButton(d.name, actionBar.transform, d.label,
+                    new Vector2(0, 0), new Vector2(0, 0), new Vector2(bx, 15), new Vector2(d.w, 64), d.c);
+                bx += d.w + 14f;
+                switch (d.name)
+                {
+                    case "CollectAllBtn":
+                        b.onClick.AddListener(() =>
+                        {
+                            var r = GameManager.Instance.CollectAll();
+                            if (r.ok) TutorialManager.Ensure()?.SignalCollect();
+                        });
+                        break;
+                    case "BuildBtn":
+                        b.onClick.AddListener(() => BuildMenu.Instance?.Toggle());
+                        break;
+                    case "DecorBtn":
+                        b.onClick.AddListener(() => DecorMenu.Instance?.Toggle());
+                        break;
+                    case "FriendsBtn":
+                        b.onClick.AddListener(() => FriendsMenu.Instance?.Toggle());
+                        break;
+                    case "QuestsBtn":
+                        b.onClick.AddListener(() => QuestsMenu.Instance?.Toggle());
+                        break;
+                    case "ExpandBtn":
+                        expandLabel = b.GetComponentInChildren<Text>();
+                        b.onClick.AddListener(() =>
+                        {
+                            if (GameManager.Instance == null) return;
+                            var r = GameManager.Instance.ExpandLand();
+                            if (r.ok) Toast.Show("⛏️ ¡Terreno ampliado!");
+                            else Toast.Show("❌ " + r.reason);
+                        });
+                        break;
+                }
+            }
         }
 
         void UpdateExpandLabel(GameState s)
@@ -119,7 +126,15 @@ namespace PuebloLoco.UI
                 return;
             }
             var tier = Catalog.LAND_TIERS[next];
-            expandLabel.text = $"⛏️ {tier.size}x{tier.size} ({tier.cost:N0} 🪙)";
+            expandLabel.text = $"⛏️ {tier.size}×{tier.size} · {Compact(tier.cost)} 🪙";
+        }
+
+        /// <summary>Formato compacto de monedas tipo city-builder: 1.8M, 25k.</summary>
+        static string Compact(long c)
+        {
+            if (c >= 1_000_000) return (c / 1_000_000.0).ToString("0.#") + "M";
+            if (c >= 1_000) return (c / 1_000.0).ToString("0.#") + "k";
+            return c.ToString();
         }
 
         void Refresh()

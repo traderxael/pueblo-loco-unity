@@ -35,40 +35,39 @@ namespace PuebloLoco.UI
             panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(transform, false);
             var rt = (RectTransform)panel.transform;
-            rt.anchorMin = new Vector2(0, 0); rt.anchorMax = new Vector2(0.40f, 1);
-            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
-            panel.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.12f, 0.95f);
+            // gaveta inferior estilo city-builder: ancho completo, sobre la barra
+            rt.anchorMin = new Vector2(0, 0); rt.anchorMax = new Vector2(1, 0);
+            rt.offsetMin = new Vector2(0, 100); rt.offsetMax = new Vector2(0, 560);
+            panel.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.12f, 0.96f);
             panel.SetActive(false);
 
-            HUD.CreateText("Title", panel.transform, "🔨 Construir", 24, TextAnchor.MiddleCenter,
-                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -58));
+            HUD.CreateText("Title", panel.transform, "🔨 Construir", 24, TextAnchor.MiddleLeft,
+                new Vector2(0, 1), new Vector2(0.5f, 1), new Vector2(20, -58));
 
             var closeBtn = HUD.CreateButton("Close", panel.transform, "✕",
                 new Vector2(1, 1), new Vector2(1, 1), new Vector2(-46, -9), new Vector2(38, 38),
                 new Color(0.8f, 0.2f, 0.2f));
             closeBtn.onClick.AddListener(Hide);
 
-            // El catálogo tiene 15 edificios: sin scroll caían fuera de la pantalla.
+            // grilla de tarjetas de edificios (estilo city-builder)
             var scrollGo = new GameObject("Scroll", typeof(RectTransform), typeof(Image), typeof(ScrollRect), typeof(RectMask2D));
             scrollGo.transform.SetParent(panel.transform, false);
             var srt = (RectTransform)scrollGo.transform;
-            srt.anchorMin = new Vector2(0.03f, 0.03f); srt.anchorMax = new Vector2(0.97f, 0.92f);
+            srt.anchorMin = new Vector2(0.01f, 0.02f); srt.anchorMax = new Vector2(0.99f, 0.88f);
             srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
             scrollGo.GetComponent<Image>().color = new Color(0, 0, 0, 0.3f);
 
-            var contentGo = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            var contentGo = new GameObject("Content", typeof(RectTransform), typeof(GridLayoutGroup), typeof(ContentSizeFitter));
             contentGo.transform.SetParent(scrollGo.transform, false);
             listContent = (RectTransform)contentGo.transform;
             listContent.anchorMin = new Vector2(0, 1); listContent.anchorMax = new Vector2(1, 1);
             listContent.pivot = new Vector2(0.5f, 1);
             listContent.offsetMin = Vector2.zero; listContent.offsetMax = Vector2.zero;
 
-            var layout = contentGo.GetComponent<VerticalLayoutGroup>();
-            layout.spacing = 8; layout.padding = new RectOffset(10, 10, 10, 10);
-            layout.childForceExpandHeight = false;
-            layout.childControlHeight = true;
-            
-            layout.childControlWidth = true;
+            var grid = contentGo.GetComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(330, 84);
+            grid.spacing = new Vector2(12, 12);
+            grid.padding = new RectOffset(12, 12, 12, 12);
 
             contentGo.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
