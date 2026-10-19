@@ -77,6 +77,21 @@ namespace PuebloLoco.Dev
                 }
             }
 
+            // capturas de los menus (UI compacta)
+            var ui = Object.FindObjectsByType<UnityEngine.UI.Button>(FindObjectsSortMode.None);
+            string[] menues = { "build", "friends", "quests", "decor" };
+            string[] nombres = { "07_menu_construir", "08_menu_amigos", "09_menu_misiones", "10_menu_decorar" };
+            for (int m = 0; m < menues.Length; m++)
+            {
+                foreach (var b in ui)
+                    if (b.name.ToLowerInvariant().Contains(menues[m])) { b.onClick.Invoke(); break; }
+                yield return new WaitForSecondsRealtime(0.7f);
+                yield return StartCoroutine(Snap(nombres[m]));
+                foreach (var b in ui)
+                    if (b.name.ToLowerInvariant().Contains(menues[m])) { b.onClick.Invoke(); break; }
+                yield return new WaitForSecondsRealtime(0.3f);
+            }
+
             Debug.Log("[CAPTURE] fin");
             Application.Quit();
         }
@@ -166,18 +181,6 @@ namespace PuebloLoco.Dev
             var es = Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>();
             var botones = Object.FindObjectsByType<UnityEngine.UI.Button>(FindObjectsSortMode.None);
             Debug.Log("[UI] eventSystem=" + (es != null) + " modulo=" + (es != null && es.currentInputModule != null) + " botones=" + botones.Length);
-            foreach (var b in botones)
-            {
-                if (b.name.ToLowerInvariant().Contains("skip")) { b.onClick.Invoke(); Debug.Log("[UI] click saltar tutorial OK"); break; }
-            }
-            foreach (var b in botones)
-            {
-                if (b.name.ToLowerInvariant().Contains("build")) { b.onClick.Invoke(); Debug.Log("[UI] click construir OK"); break; }
-            }
-            var bm = Object.FindAnyObjectByType<PuebloLoco.UI.BuildMenu>();
-            bool bmVisible = false;
-            if (bm != null) { foreach (Transform c in bm.transform) if (c.name.ToLowerInvariant().Contains("panel")) bmVisible = c.gameObject.activeSelf; }
-            Debug.Log("[UI] buildMenuVisible=" + bmVisible);
             var tutorial = PuebloLoco.UI.TutorialManager.Instance;
             if (tutorial != null) tutorial.EndTutorial(true);
 

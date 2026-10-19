@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using PuebloLoco.Gameplay;
@@ -31,6 +32,18 @@ namespace PuebloLoco
             Object.DontDestroyOnLoad(go);
         }
 
+
+        /// <summary>
+        /// UI compacta: sube la resolución de referencia de todas las canvases
+        /// (los elementos quedan ~20% mas chicos y el texto tiene mas aire).
+        /// </summary>
+        static void NormalizeUI()
+        {
+            foreach (var cs in Object.FindObjectsByType<CanvasScaler>(FindObjectsSortMode.None))
+            {
+                cs.referenceResolution = new Vector2(2048f, 1152f);
+            }
+        }
         void Awake()
         {
             EnsureEventSystem();
@@ -91,6 +104,7 @@ namespace PuebloLoco
                 new GameObject("DecorMenu").AddComponent<DecorMenu>();
             TutorialManager.Ensure();
             SetupPostFx();
+            NormalizeUI();
 
             // Vecinos animados (modelos con esqueleto hechos en Blender)
             if (FindAnyObjectByType<VillagerManager>() == null)

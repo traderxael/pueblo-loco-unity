@@ -32,11 +32,11 @@ namespace PuebloLoco.UI
                 new Color(0.08f, 0.08f, 0.12f, 0.96f)).gameObject;
             panel.SetActive(false);
 
-            HUD.CreateText("Title", panel.transform, "🧑 Vecinos", 32, TextAnchor.MiddleCenter,
-                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -70));
+            HUD.CreateText("Title", panel.transform, "🧑 Vecinos", 24, TextAnchor.MiddleCenter,
+                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -58));
 
             var closeBtn = HUD.CreateButton("Close", panel.transform, "✕",
-                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-60, -10), new Vector2(50, 50),
+                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-46, -9), new Vector2(38, 38),
                 new Color(0.8f, 0.2f, 0.2f));
             closeBtn.onClick.AddListener(Hide);
 
@@ -58,7 +58,8 @@ namespace PuebloLoco.UI
             var layout = contentGo.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 8; layout.padding = new RectOffset(10, 10, 10, 10);
             layout.childForceExpandHeight = false;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
+            
             layout.childControlWidth = true;
 
             var fitter = contentGo.GetComponent<ContentSizeFitter>();
@@ -125,7 +126,7 @@ namespace PuebloLoco.UI
                 }
 
                 HUD.CreateText("Name", row.transform, $"{def.name}   {status}",
-                    22, TextAnchor.MiddleLeft, new Vector2(0, 0.5f), new Vector2(1, 1), new Vector2(15, 0));
+                    17, TextAnchor.MiddleLeft, new Vector2(0, 0.5f), new Vector2(1, 1), new Vector2(15, 0));
 
                 if (locked)
                 {
@@ -161,7 +162,7 @@ namespace PuebloLoco.UI
                         var t = task;
                         var charDefId = def.def;
                         var tbtn = HUD.CreateButton($"T_{t.id}", row.transform, $"{t.name} ({FormatDur(t.sec)})",
-                            new Vector2(1, 0), new Vector2(1, 1), new Vector2(bx, 0), new Vector2(200, 70),
+                            new Vector2(1, 0), new Vector2(1, 1), new Vector2(bx, 0), new Vector2(160, 56),
                             new Color(0.2f, 0.5f, 0.85f));
                         var rt = (RectTransform)tbtn.transform;
                         rt.anchorMin = new Vector2(1, 0); rt.anchorMax = new Vector2(1, 1);
@@ -200,7 +201,7 @@ namespace PuebloLoco.UI
                 // tareas info
                 if (locked || cs.task != null)
                     HUD.CreateText("Tasks", row.transform, TaskSummary(def),
-                        14, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(0.6f, 0.5f), new Vector2(15, 5));
+                        12, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(0.6f, 0.5f), new Vector2(15, 5));
             }
         }
 

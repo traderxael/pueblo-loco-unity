@@ -43,13 +43,13 @@ namespace PuebloLoco.UI
             // tarjeta del tutorial (parte inferior)
             var cardRt = HUD.CreatePanel("TutCard", transform,
                 new Vector2(0.1f, 0), new Vector2(0.9f, 0),
-                new Vector2(0, 20), new Vector2(0, 140), new Color(0.05f, 0.05f, 0.1f, 0.92f));
+                new Vector2(0, 14), new Vector2(0, 104), new Color(0.05f, 0.05f, 0.1f, 0.92f));
             card = cardRt.gameObject;
             var outline = card.AddComponent<Outline>();
             outline.effectColor = new Color(0.3f, 0.7f, 1f);
             outline.effectDistance = new Vector2(2, 2);
 
-            cardText = HUD.CreateText("TutText", card.transform, "", 26, TextAnchor.MiddleCenter,
+            cardText = HUD.CreateText("TutText", card.transform, "", 18, TextAnchor.MiddleCenter,
                 new Vector2(0.02f, 0.25f), new Vector2(0.98f, 1), new Vector2(0, 0));
             cardText.supportRichText = true;
 
@@ -57,7 +57,7 @@ namespace PuebloLoco.UI
                 new Vector2(0.75f, 0), new Vector2(1, 0.28f), Vector2.zero, new Vector2(0, 0),
                 new Color(0.25f, 0.25f, 0.3f, 0.9f));
             var skipLabel = skip.GetComponentInChildren<Text>();
-            skipLabel.fontSize = 16;
+            skipLabel.fontSize = 13;
             skipLabel.color = new Color(0.8f, 0.8f, 0.85f);
             skip.onClick.AddListener(() => EndTutorial(true));
 
@@ -77,7 +77,7 @@ namespace PuebloLoco.UI
             bounceRect.offsetMin = Vector2.zero;
             bounceRect.offsetMax = Vector2.zero;
 
-            var text = HUD.CreateText("ArrowGlyph", bounceGo.transform, "▼", 42, TextAnchor.MiddleCenter,
+            var text = HUD.CreateText("ArrowGlyph", bounceGo.transform, "▼", 28, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, Vector2.zero);
             text.color = new Color(1f, 0.9f, 0.2f);
             arrow = arrowGo;

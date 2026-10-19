@@ -35,16 +35,16 @@ namespace PuebloLoco.UI
             panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(transform, false);
             var rt = (RectTransform)panel.transform;
-            rt.anchorMin = new Vector2(0, 0); rt.anchorMax = new Vector2(0.45f, 1);
+            rt.anchorMin = new Vector2(0, 0); rt.anchorMax = new Vector2(0.40f, 1);
             rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
             panel.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.12f, 0.95f);
             panel.SetActive(false);
 
-            HUD.CreateText("Title", panel.transform, "🔨 Construir", 32, TextAnchor.MiddleCenter,
-                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -70));
+            HUD.CreateText("Title", panel.transform, "🔨 Construir", 24, TextAnchor.MiddleCenter,
+                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -58));
 
             var closeBtn = HUD.CreateButton("Close", panel.transform, "✕",
-                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-60, -10), new Vector2(50, 50),
+                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-46, -9), new Vector2(38, 38),
                 new Color(0.8f, 0.2f, 0.2f));
             closeBtn.onClick.AddListener(Hide);
 
@@ -66,7 +66,8 @@ namespace PuebloLoco.UI
             var layout = contentGo.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 8; layout.padding = new RectOffset(10, 10, 10, 10);
             layout.childForceExpandHeight = false;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
+            
             layout.childControlWidth = true;
 
             contentGo.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -123,7 +124,7 @@ namespace PuebloLoco.UI
 
                 string status = locked ? $"🔒 Nv {def.level}" : $"🪙 {def.cost:N0}";
                 HUD.CreateText("Name", row, $"{def.name}  ({def.size}x{def.size})  {status}",
-                    20, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
+                    16, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
 
                 if (locked) continue;
 

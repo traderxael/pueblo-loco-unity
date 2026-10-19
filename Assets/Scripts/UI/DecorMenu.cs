@@ -38,11 +38,11 @@ namespace PuebloLoco.UI
                 new Color(0.08f, 0.08f, 0.12f, 0.96f)).gameObject;
             panel.SetActive(false);
 
-            HUD.CreateText("Title", panel.transform, "🌿 Decorar", 32, TextAnchor.MiddleCenter,
-                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -70));
+            HUD.CreateText("Title", panel.transform, "🌿 Decorar", 24, TextAnchor.MiddleCenter,
+                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -58));
 
             var closeBtn = HUD.CreateButton("Close", panel.transform, "✕",
-                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-60, -10), new Vector2(50, 50),
+                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-46, -9), new Vector2(38, 38),
                 new Color(0.8f, 0.2f, 0.2f));
             closeBtn.onClick.AddListener(Hide);
 
@@ -63,7 +63,8 @@ namespace PuebloLoco.UI
             var layout = contentGo.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 8; layout.padding = new RectOffset(10, 10, 10, 10);
             layout.childForceExpandHeight = false;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
+            
             layout.childControlWidth = true;
 
             contentGo.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -117,13 +118,13 @@ namespace PuebloLoco.UI
                 string status = locked ? $"🔒 Nv {def.level}" : $"🪙 {def.cost:N0}";
                 string ownedTxt = owned > 0 ? $"   x{owned}" : "";
                 HUD.CreateText("Name", row, $"{def.name}{ownedTxt}   {status}",
-                    22, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
+                    17, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
 
                 if (locked) continue;
 
                 var defId = def.def;
                 var btn = HUD.CreateButton("Buy", row, "Comprar",
-                    new Vector2(1, 0), new Vector2(1, 1), new Vector2(-15, 0), new Vector2(150, 55),
+                    new Vector2(1, 0), new Vector2(1, 1), new Vector2(-15, 0), new Vector2(124, 46),
                     poor ? new Color(0.35f, 0.35f, 0.4f) : new Color(0.2f, 0.7f, 0.3f));
                 var rt = (RectTransform)btn.transform;
                 rt.anchorMin = new Vector2(1, 0.15f); rt.anchorMax = new Vector2(1, 0.85f);

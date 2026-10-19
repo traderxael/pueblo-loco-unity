@@ -30,7 +30,7 @@ namespace PuebloLoco.UI
             canvas.sortingOrder = 10;
             var scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.referenceResolution = new Vector2(2048, 1152);
             gameObject.AddComponent<GraphicRaycaster>();
 
             // panel superior

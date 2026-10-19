@@ -32,11 +32,11 @@ namespace PuebloLoco.UI
                 new Color(0.08f, 0.08f, 0.12f, 0.96f)).gameObject;
             panel.SetActive(false);
 
-            HUD.CreateText("Title", panel.transform, "📋 Misiones", 32, TextAnchor.MiddleCenter,
-                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -70));
+            HUD.CreateText("Title", panel.transform, "📋 Misiones", 24, TextAnchor.MiddleCenter,
+                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, -58));
 
             var closeBtn = HUD.CreateButton("Close", panel.transform, "✕",
-                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-60, -10), new Vector2(50, 50),
+                new Vector2(1, 1), new Vector2(1, 1), new Vector2(-46, -9), new Vector2(38, 38),
                 new Color(0.8f, 0.2f, 0.2f));
             closeBtn.onClick.AddListener(Hide);
 
@@ -57,7 +57,8 @@ namespace PuebloLoco.UI
             var layout = contentGo.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 8; layout.padding = new RectOffset(10, 10, 10, 10);
             layout.childForceExpandHeight = false;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
+            
             layout.childControlWidth = true;
             contentGo.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
@@ -110,14 +111,14 @@ namespace PuebloLoco.UI
             {
                 var row = CreateRow("ActiveQuest", new Color(0.15f, 0.25f, 0.15f), 130);
                 HUD.CreateText("Name", row.transform, $"⭐ {q.name}  ({s.questIndex + 1}/{Catalog.QUESTS.Length})",
-                    22, TextAnchor.UpperLeft, new Vector2(0, 0.6f), new Vector2(1, 1), new Vector2(15, 5));
+                    17, TextAnchor.UpperLeft, new Vector2(0, 0.6f), new Vector2(1, 1), new Vector2(15, 5));
                 HUD.CreateText("Story", row.transform, q.story,
-                    16, TextAnchor.LowerLeft, new Vector2(0, 0.3f), new Vector2(1, 0.6f), new Vector2(15, 0));
+                    13, TextAnchor.LowerLeft, new Vector2(0, 0.3f), new Vector2(1, 0.6f), new Vector2(15, 0));
                 string rw = "";
                 if (q.reward.donas > 0) rw += $"{q.reward.donas}🍩 ";
                 if (q.reward.xp > 0) rw += $"{q.reward.xp}⭐";
                 HUD.CreateText("Reward", row.transform, $"Recompensa: {rw}",
-                    14, TextAnchor.LowerRight, new Vector2(0.5f, 0), new Vector2(1, 0.35f), new Vector2(0, 5));
+                    12, TextAnchor.LowerRight, new Vector2(0.5f, 0), new Vector2(1, 0.35f), new Vector2(0, 5));
                 // objetivos
                 string objs = "";
                 foreach (var o in q.objs)
@@ -126,13 +127,13 @@ namespace PuebloLoco.UI
                     objs += (done ? "✅ " : "⬜ ") + ObjectiveLabel(o) + "\n";
                 }
                 HUD.CreateText("Objs", row.transform, objs.TrimEnd(),
-                    14, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(0.6f, 0.35f), new Vector2(15, 5));
+                    12, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(0.6f, 0.35f), new Vector2(15, 5));
             }
             else
             {
                 var row = CreateRow("AllDone", new Color(0.2f, 0.35f, 0.2f), 70);
                 HUD.CreateText("Msg", row.transform, "🏆 ¡Todas las misiones completadas! Eres leyenda local",
-                    20, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero);
+                    16, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero);
             }
 
             // ── Misiones diarias ──
