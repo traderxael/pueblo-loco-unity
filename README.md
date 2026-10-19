@@ -229,6 +229,27 @@ Modelo real de la comunidad en vez de generado por script:
   `attack -> Work` (trabaja entrenando con la katana), `damage -> Wave`.
 - Integrado como **Guerrero Ko** (35 donas) con tareas "Entrenar con la
   katana" y "Ronda de guardia"; el tinte respeta su textura original.
+
+### Calle estilo Frostpunk + 3 modelos descargados (v8)
+
+**Camino de piedra** (`SM_Prop_Street`, generado por script): losas de piedra con
+bordes y dos faroles rojos — el look de senderos de Frostpunk con tema chino.
+Encastra en la grilla de decor (1x1) para unir edificios con la pagoda.
+
+**Modelos reales de OpenGameArt** (convertidos de .blend a FBX con Blender):
+
+| Asset | Fuente | Licencia | En el juego |
+|---|---|---|---|
+| `SM_Prop_Gong` | [China Gong](https://opengameart.org/content/chinagong) | CC0 | **Gong del templo** (4.000, Nv 5) |
+| `SM_Prop_Cart` | [Chinese Food Cart](https://opengameart.org/content/chinese-food-cart) | CC-BY 3.0 | **Carrito de comida** (900, Nv 3) |
+| `SM_Prop_Dragon` | [Flying Dragon](https://opengameart.org/content/flying-dragon) | CC0 | **Dragon de jade** (15.000, Nv 7) |
+
+- El **dragon chino dorado** (13 meshes, 44 huesos, 7 clips) VUELA: controller con
+  todos los clips en loop, default `DragonFlying1`, escala 5.5 (~3 m) elevado
+  sobre la plaza. Sus texturas son normal maps; el color dorado viene del material.
+- El carrito conserva sus 3 texturas originales (cuerpo, techo y ruedas).
+- Las escalas se calibraron con una sonda del ModelImporter (el .blend del dragon
+  venia normalizado a 0.55 u; con escala 0.10 quedaba invisible de 5 cm).
 ## Cómo jugar
 
 | Acción | Control |

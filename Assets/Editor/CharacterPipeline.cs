@@ -98,7 +98,51 @@ namespace PuebloLoco.EditorTools
                 Debug.Log($"[CHARS] {m}: clips=[{string.Join(", ", clipNames)}] bounds={bounds} controller={(ctrl != null ? AssetDatabase.GetAssetPath(ctrl) : "ERROR")}");
             }
             AssetDatabase.SaveAssets();
+            BuildDragonController();
             Debug.Log("[CHARS] controllers listos");
+        }
+
+        /// <summary>Controller del dragón decorativo: todos sus clips en loop y
+        /// como estado default el que suene a vuelo/idle (o el primero).</summary>
+        static void BuildDragonController()
+        {
+            const string fbx = "Assets/Resources/China/SM_Prop_Dragon.fbx";
+            var clips = LoadClips(fbx);
+            if (clips.Count == 0) { Debug.LogWarning("[DRAGON] sin clips en " + fbx); return; }
+
+            foreach (var c in clips)
+            {
+                var st = AnimationUtility.GetAnimationClipSettings(c);
+                st.loopTime = true;
+                AnimationUtility.SetAnimationClipSettings(c, st);
+            }
+
+            const string path = "Assets/Resources/Animations/SM_Prop_Dragon.controller";
+            AssetDatabase.DeleteAsset(path);
+            var ctrl = AnimatorController.CreateAnimatorControllerAtPath(path);
+            var sm = ctrl.layers[0].stateMachine;
+            var states = new Dictionary<string, AnimatorState>();
+            foreach (var c in clips)
+            {
+                string n = CleanName(c.name);
+                var s = sm.AddState(n);
+                s.motion = c;
+                s.writeDefaultValues = false;
+                states[n] = s;
+            }
+            AnimatorState pick = null;
+            foreach (var kv in states)
+            {
+                string l = kv.Key.ToLowerInvariant();
+                if (l.Contains("fly") || l.Contains("idle") || l.Contains("hover"))
+                {
+                    pick = kv.Value;
+                    break;
+                }
+            }
+            sm.defaultState = pick != null ? pick : states[CleanName(clips[0].name)];
+            EditorUtility.SetDirty(ctrl);
+            Debug.Log("[DRAGON] controller con " + clips.Count + " clips, default=" + sm.defaultState.name);
         }
 
         static List<AnimationClip> LoadClips(string path)

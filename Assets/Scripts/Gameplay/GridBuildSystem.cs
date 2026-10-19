@@ -95,6 +95,10 @@ namespace PuebloLoco.Gameplay
             {
                 { "farol", "China/SM_Prop_Lantern" },
                 { "estatua", "China/SM_Prop_Ding" },
+                { "camino", "China/SM_Prop_Street" },
+                { "carrito", "China/SM_Prop_Cart" },
+                { "gong", "China/SM_Prop_Gong" },
+                { "dragon", "China/SM_Prop_Dragon" },
             };
             foreach (var kv in decorMap)
             {
@@ -246,9 +250,25 @@ namespace PuebloLoco.Gameplay
                 {
                     decor = Instantiate(dp, buildingRoot);
                     decor.transform.localPosition = pos;
-                    decor.transform.localScale = Vector3.one * (d.def == "farol" ? 0.62f : 0.8f);
+                    decor.transform.localScale = Vector3.one * DecorScale(d.def);
                     decor.name = $"Decor_{d.id}";
-                    ApplyPalette(decor, null, null);
+                    if (d.def == "dragon")
+                    {
+                        // el dragón vuela sobre la plaza (centro del pueblo)
+                        decor.transform.localPosition += Vector3.up * 0.5f;
+                        var animCtrl = Resources.Load<RuntimeAnimatorController>("Animations/SM_Prop_Dragon");
+                        if (animCtrl != null)
+                        {
+                            var anim = decor.GetComponentInChildren<Animator>();
+                            if (anim == null) anim = decor.AddComponent<Animator>();
+                            anim.runtimeAnimatorController = animCtrl;
+                            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                        }
+                    }
+                    // los modelos descargados (gong/carrito/dragón) conservan su
+                    // textura original; solo se tiñen los generados por script.
+                    if (d.def == "farol" || d.def == "estatua" || d.def == "camino")
+                        ApplyPalette(decor, null, null);
                 }
                 else
                 {
@@ -260,6 +280,23 @@ namespace PuebloLoco.Gameplay
                     ApplyFlat(decor, c);
                     decor.name = $"Decor_{d.id}";
                 }
+            }
+        }
+
+        /// <summary>Escala por tipo de decor: los modelos descargados vienen en
+        /// unidades distintas (gong ~6.4u, carrito ~6.8u, dragón ~40u de path).</summary>
+        static float DecorScale(string def)
+        {
+            switch (def)
+            {
+                case "farol": return 0.62f;
+                case "estatua": return 0.8f;
+                case "camino": return 1f;
+                case "carrito": return 0.23f;
+                case "gong": return 0.30f;
+                // el FBX del dragon viene normalizado a ~0.55 u (blend en escala 100x)
+                case "dragon": return 5.5f;
+                default: return 0.8f;
             }
         }
 

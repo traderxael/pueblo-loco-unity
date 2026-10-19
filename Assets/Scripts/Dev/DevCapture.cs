@@ -144,7 +144,9 @@ namespace PuebloLoco.Dev
             s.decor.Clear();
             var decor = new[]
             {
-                ("farol", 1, 5), ("farol", 7, 2), ("estatua", 0, 3), ("estatua", 7, 7)
+                ("farol", 1, 5), ("farol", 7, 2), ("estatua", 0, 3), ("estatua", 7, 7),
+                ("camino", 4, 8), ("camino", 5, 8), ("camino", 4, 9), ("camino", 5, 9),
+                ("gong", 3, 8), ("carrito", 8, 6), ("dragon", 7, 5)
             };
             foreach (var d in decor)
             {

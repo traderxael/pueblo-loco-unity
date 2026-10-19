@@ -237,6 +237,11 @@ namespace PuebloLoco.Core
             new DecorDef("banco",   "Banco",   800,   3, "#a04000"),
             new DecorDef("fuente",  "Fuente",  3000,  4, "#5dade2"),
             new DecorDef("estatua", "Estatua", 12000, 6, "#b2babb"),
+            // nuevos: camino de piedra (estilo Frostpunk) + modelos CC0/CC-BY
+            new DecorDef("camino",  "Camino de piedra", 150,  1, "#b2babb"),
+            new DecorDef("carrito", "Carrito de comida", 900, 3, "#e67e22"),
+            new DecorDef("gong",    "Gong del templo",  4000, 5, "#c0392b"),
+            new DecorDef("dragon",  "Dragón de jade",   15000, 7, "#148f77"),
         };
 
         public static readonly LandTier[] LAND_TIERS =
