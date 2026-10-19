@@ -222,7 +222,13 @@ namespace PuebloLoco.Core
                 new TaskDef("negociar", "Negociar con mercaderes", 3600,  700,  140)),
             new CharacterDef("campesino", "Campesino Li", 15, "#8d6e63", "#4e342e",
                 new TaskDef("sembrar",  "Sembrar arroz",           2400,  380,  80),
-                new TaskDef("cosechar", "Cosechar la cosecha",     5400,  980,  190)),        };
+                new TaskDef("cosechar", "Cosechar la cosecha",     5400,  980,  190)),
+
+            // Modelo 3D real descargado de OpenGameArt (CC-BY 4.0, autor
+            // null-painter-error): samurai lowpoly con 5 animaciones.
+            new CharacterDef("guerrero", "Guerrero Kō", 35, "#c0392b", "#2c3e50",
+                new TaskDef("katana",   "Entrenar con la katana",  1800,  420,  90),
+                new TaskDef("ronda",    "Ronda de guardia",        3600,  900,  180)),        };
 
         public static readonly DecorDef[] DECOR =
         {

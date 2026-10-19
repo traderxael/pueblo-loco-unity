@@ -34,11 +34,21 @@ namespace PuebloLoco.EditorTools
             mi.importLights = false;
 
             var clips = mi.defaultClipAnimations;
+            bool samurai = path.EndsWith("samurai.fbx");
             foreach (var c in clips)
             {
                 string n = c.takeName;
                 int bar = n.LastIndexOf('|');
                 if (bar >= 0) n = n.Substring(bar + 1);
+                // El samurai de OpenGameArt trae clips en minusculas con otros
+                // nombres; se mapean a los estados canonico del juego.
+                if (samurai)
+                {
+                    if (n == "idle") n = "Idle";
+                    else if (n == "walk") n = "Walk";
+                    else if (n == "attack") n = "Work";
+                    else if (n == "damage") n = "Wave";
+                }
                 c.name = n;
                 c.loopTime = n == "Idle" || n == "Walk" || n == "Run" || n == "Work";
             }
@@ -48,7 +58,7 @@ namespace PuebloLoco.EditorTools
 
     public static class CharacterPipeline
     {
-        static readonly string[] Models = { "Villager", "Kid", "Elder", "SK_Sabio", "SK_Guardia", "SK_Merchant", "SK_Farmer" };
+        static readonly string[] Models = { "Villager", "Kid", "Elder", "SK_Sabio", "SK_Guardia", "SK_Merchant", "SK_Farmer", "samurai" };
 
         [MenuItem("Pueblo Loco/1. Importar personajes y crear Animators")]
         public static void BuildControllers()
@@ -126,6 +136,16 @@ namespace PuebloLoco.EditorTools
             foreach (var clip in clips)
             {
                 string stateName = CleanName(clip.name);
+                // El samurai (OpenGameArt) trae clips en minusculas; se mapean
+                // a los estados canonico para que las transiciones enganchen.
+                if (name == "samurai")
+                {
+                    if (stateName == "idle") stateName = "Idle";
+                    else if (stateName == "walk") stateName = "Walk";
+                    else if (stateName == "attack") stateName = "Work";
+                    else if (stateName == "damage") stateName = "Wave";
+                    else stateName = "Die";
+                }
                 var st = sm.AddState(stateName);
                 st.motion = clip;
                 st.writeDefaultValues = false;

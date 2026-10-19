@@ -216,6 +216,19 @@ Generado con `Tools/Blender/build_china_assets_v4.py`:
   panel superior. Reubicados.
 - **Aparición de edificios** con animación de rebote (PopIn).
 
+
+### Personaje 3D descargado: Guerrero Ko (v7)
+
+Modelo real de la comunidad en vez de generado por script:
+
+- **Samurai lowpoly con animaciones** por [null-painter-error](https://opengameart.org/content/3d-lowpoly-samurai-with-animations-fbx-format)
+  (OpenGameArt, **CC-BY 4.0**).
+- 21 huesos (rig generico), textura propia (`samutex.png`) y 5 clips:
+  `idle`, `walk`, `attack`, `damage`, `die`.
+- Se mapean al esquema del juego: `idle -> Idle`, `walk -> Walk`,
+  `attack -> Work` (trabaja entrenando con la katana), `damage -> Wave`.
+- Integrado como **Guerrero Ko** (35 donas) con tareas "Entrenar con la
+  katana" y "Ronda de guardia"; el tinte respeta su textura original.
 ## Cómo jugar
 
 | Acción | Control |

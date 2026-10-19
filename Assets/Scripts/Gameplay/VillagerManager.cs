@@ -78,6 +78,9 @@ namespace PuebloLoco.Gameplay
                 case "guardia": modelName = "SK_Guardia"; scale = 0.56f; break;
                 case "comerciante": modelName = "SK_Merchant"; scale = 0.55f; break;
                 case "campesino": modelName = "SK_Farmer"; scale = 0.55f; break;
+                // samurai.fbx de OpenGameArt (CC-BY 4.0): el FBX mide ~5.8 u
+                // de alto con huesos IK; la malla real es ~1.75 u.
+                case "guerrero": modelName = "samurai"; scale = 0.58f; break;
                 default: modelName = "Villager"; scale = 0.55f; break;
             }
 
