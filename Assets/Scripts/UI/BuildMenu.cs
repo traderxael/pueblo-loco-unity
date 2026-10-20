@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using PuebloLoco.Core;
 using PuebloLoco.Gameplay;
 
@@ -76,16 +78,51 @@ namespace PuebloLoco.UI
             scroll.horizontal = false;
         }
 
+        // icono por edificio para las tarjetas (estilo city-builder)
+        static readonly System.Collections.Generic.Dictionary<string, string> Icons =
+            new System.Collections.Generic.Dictionary<string, string>
+        {
+            {"casa","🏠"},{"kiosco","📰"},{"floreria","🌷"},{"panaderia","🥖"},{"taller","🔧"},
+            {"casahan","🏠"},{"cafeteria","☕"},{"cine","🎬"},{"pagoda","🛕"},{"mercado","🏮"},
+            {"muralla","🧱"},{"templo","⛩️"},{"granja","🌾"},{"herreria","⚒️"},{"posada","🏨"},
+            {"campanario","🔔"},{"escuela","🏫"},{"hospital","🏥"},{"comisaria","🚓"},
+            {"estadio","🏟️"},{"torre","🗼"},
+        };
+
         public void Toggle()
         {
             visible = !visible;
-            panel.SetActive(visible);
             if (visible)
             {
+                panel.SetActive(true);
+                StopAllCoroutines();
+                StartCoroutine(SlideIn(100f, 560f));
                 TutorialManager.Ensure()?.SignalShop();
                 refreshTimer = 0f;
                 Refresh();
             }
+            else
+            {
+                Tooltip.Hide();
+                panel.SetActive(false);
+            }
+        }
+
+        /// <summary>La gaveta sube desde abajo con easing (0.22 s).</summary>
+        IEnumerator SlideIn(float bottom, float top)
+        {
+            var rt = (RectTransform)panel.transform;
+            float t = 0f;
+            while (t < 1f)
+            {
+                t += Time.unscaledDeltaTime / 0.22f;
+                float e = 1f - Mathf.Pow(1f - Mathf.Clamp01(t), 3f); // easeOutCubic
+                rt.offsetMin = new Vector2(0f, Mathf.Lerp(-500f, bottom, e));
+                rt.offsetMax = new Vector2(0f, Mathf.Lerp(-100f, top, e));
+                yield return null;
+            }
+            rt.offsetMin = new Vector2(0f, bottom);
+            rt.offsetMax = new Vector2(0f, top);
         }
 
         public void Hide()
@@ -116,14 +153,37 @@ namespace PuebloLoco.UI
             foreach (var def in Catalog.BUILDINGS)
             {
                 bool locked = s.level < def.level;
-                var color = locked ? new Color(0.3f, 0.3f, 0.3f) : new Color(0.15f, 0.15f, 0.2f);
+                bool poor = !locked && s.coins < def.cost;
+                var baseColor = locked ? new Color(0.3f, 0.3f, 0.3f)
+                              : poor ? new Color(0.28f, 0.22f, 0.18f)
+                              : new Color(0.15f, 0.15f, 0.2f);
                 var row = HUD.CreatePanel(def.def, listContent, Vector2.zero, Vector2.one,
-                    Vector2.zero, Vector2.zero, color);
-                row.gameObject.AddComponent<LayoutElement>().preferredHeight = 70;
+                    Vector2.zero, Vector2.zero, baseColor);
 
-                string status = locked ? $"🔒 Nv {def.level}" : $"🪙 {def.cost:N0}";
-                HUD.CreateText("Name", row, $"{def.name}  ({def.size}x{def.size})  {status}",
-                    16, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
+                string icon = Icons.TryGetValue(def.def, out var ic) ? ic : "🏛️";
+                string status = locked ? $"<color=#ffab40>🔒 Nv {def.level}</color>"
+                              : poor ? $"<color=#ff5252>🪙 {def.cost:N0}</color>"
+                              : $"<color=#ffd54f>🪙 {def.cost:N0}</color>";
+                HUD.CreateText("Name", row,
+                    $"<size=32>{icon}</size>  <size=16>{def.name} <color=#90a4ae>({def.size}x{def.size})</color>  {status}</size>",
+                    16, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(12, 0));
+
+                // tooltip + realce al pasar el mouse (estilo city-builder)
+                string tipTitle = $"{icon} {def.name}";
+                string tipBody = locked
+                    ? $"🔒 Se desbloquea en el nivel {def.level}."
+                    : $"Produce {def.coins:N0} 🪙 cada {def.interval}s · +{def.xp} XP\n" +
+                      $"Costo: {def.cost:N0} 🪙 · Nivel {def.level} · Tamaño {def.size}x{def.size}" +
+                      (poor ? $"\n<color=#ff5252>Te faltan {def.cost - s.coins:N0} 🪙</color>" : "");
+                var img = row.GetComponent<Image>();
+                var hi = baseColor * 1.35f; hi.a = baseColor.a;
+                var trig = row.gameObject.AddComponent<EventTrigger>();
+                var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enter.callback.AddListener(_ => { img.color = hi; Tooltip.Show(tipTitle, tipBody); });
+                trig.triggers.Add(enter);
+                var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                exit.callback.AddListener(_ => { img.color = baseColor; Tooltip.Hide(); });
+                trig.triggers.Add(exit);
 
                 if (locked) continue;
 
@@ -132,6 +192,7 @@ namespace PuebloLoco.UI
                 btn.onClick.AddListener(() =>
                 {
                     if (GridBuildSystem.Instance != null) GridBuildSystem.Instance.BeginPlacing(defId);
+                    Tooltip.Hide();
                     Hide();
                 });
             }

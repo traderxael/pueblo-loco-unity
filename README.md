@@ -266,6 +266,20 @@ de ciudad (Frostpunk / Cities: Skylines / Anno):
   (100-560 px sobre la barra) con **grilla de tarjetas** de 330x84 en vez
   de lista lateral. Los 21 edificios quedan en 5 columnas con scroll.
 - Recursos (monedas, donas, nivel + barra XP) permanecen en la franja superior.
+
+### Pulido de UI v10: tooltips, iconos y animacion
+
+- **Tooltips estilo city-builder**: nueva clase `Tooltip` que sigue el cursor al
+  pasar el mouse sobre las tarjetas. Muestra produccion ("Produce 8 🪙 cada 30s ·
+  +10 XP"), costo, nivel, tamano, y aviso en rojo si faltan monedas. Se ubica a la
+  derecha-arriba del cursor y se invierte en los bordes.
+- **Icono por edificio/adorno** en cada tarjeta (🏠 🥖 🛕 🌾 ⛔ ... 🗿 🐉) con
+  rich text (`<size=32>` para el icono).
+- **Colores de estado**: costo en dorado, rojo si no alcanza, naranja si esta
+  bloqueado, y gris azulado para el tamano.
+- **Realce al pasar el mouse**: la tarjeta se ilumina (color x1.35).
+- **Animacion de gaveta**: Construir y Decorar suben desde abajo con easing
+  easeOutCubic (0.22 s) en vez de aparecer de golpe.
 ## Cómo jugar
 
 | Acción | Control |

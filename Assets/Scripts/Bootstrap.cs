@@ -103,6 +103,9 @@ namespace PuebloLoco
             if (FindAnyObjectByType<DecorMenu>() == null)
                 new GameObject("DecorMenu").AddComponent<DecorMenu>();
             TutorialManager.Ensure();
+            // tooltip flotante de las tarjetas (estilo city-builder)
+            if (FindAnyObjectByType<Tooltip>() == null)
+                new GameObject("Tooltip").AddComponent<Tooltip>();
             SetupPostFx();
             NormalizeUI();
 

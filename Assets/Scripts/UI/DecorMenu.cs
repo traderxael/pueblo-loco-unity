@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using PuebloLoco.Core;
 using PuebloLoco.Gameplay;
 
@@ -75,11 +77,47 @@ namespace PuebloLoco.UI
             scroll.horizontal = false;
         }
 
+        // icono por adorno para las tarjetas
+        static readonly System.Collections.Generic.Dictionary<string, string> Icons =
+            new System.Collections.Generic.Dictionary<string, string>
+        {
+            {"farol","🏮"},{"arbusto","🌳"},{"banco","🪑"},{"fuente","⛲"},{"estatua","🗿"},
+            {"camino","🛤️"},{"carrito","🍜"},{"gong","🥁"},{"dragon","🐉"},
+        };
+
         public void Toggle()
         {
             visible = !visible;
-            panel.SetActive(visible);
-            if (visible) { refreshTimer = 0f; Refresh(); }
+            if (visible)
+            {
+                panel.SetActive(true);
+                StopAllCoroutines();
+                StartCoroutine(SlideIn(100f, 480f));
+                refreshTimer = 0f;
+                Refresh();
+            }
+            else
+            {
+                Tooltip.Hide();
+                panel.SetActive(false);
+            }
+        }
+
+        /// <summary>La gaveta sube desde abajo con easing (0.22 s).</summary>
+        IEnumerator SlideIn(float bottom, float top)
+        {
+            var rt = (RectTransform)panel.transform;
+            float t = 0f;
+            while (t < 1f)
+            {
+                t += Time.unscaledDeltaTime / 0.22f;
+                float e = 1f - Mathf.Pow(1f - Mathf.Clamp01(t), 3f);
+                rt.offsetMin = new Vector2(0f, Mathf.Lerp(-420f, bottom, e));
+                rt.offsetMax = new Vector2(0f, Mathf.Lerp(-80f, top, e));
+                yield return null;
+            }
+            rt.offsetMin = new Vector2(0f, bottom);
+            rt.offsetMax = new Vector2(0f, top);
         }
 
         public void Hide()
@@ -116,10 +154,31 @@ namespace PuebloLoco.UI
                              : new Color(0.12f, 0.16f, 0.14f);
                 var row = CreateRow(def.def, rowColor, 80);
 
-                string status = locked ? $"🔒 Nv {def.level}" : $"🪙 {def.cost:N0}";
-                string ownedTxt = owned > 0 ? $"   x{owned}" : "";
-                HUD.CreateText("Name", row, $"{def.name}{ownedTxt}   {status}",
-                    17, TextAnchor.MiddleLeft, Vector2.zero, Vector2.one, new Vector2(15, 0));
+                string icon = Icons.TryGetValue(def.def, out var ic) ? ic : "🗿";
+                string status = locked ? $"<color=#ffab40>🔒 Nv {def.level}</color>"
+                              : poor ? $"<color=#ff5252>🪙 {def.cost:N0}</color>"
+                              : $"<color=#ffd54f>🪙 {def.cost:N0}</color>";
+                string ownedTxt = owned > 0 ? $"<color=#90a4ae>  x{owned}</color>" : "";
+                HUD.CreateText("Name", row,
+                    $"<size=32>{icon}</size>  <size=17>{def.name}{ownedTxt}  {status}</size>",
+                    17, TextAnchor.MiddleLeft, new Vector2(0, 0), new Vector2(1, 1), new Vector2(12, 0));
+
+                // tooltip + realce al pasar el mouse (estilo city-builder)
+                string tipTitle = $"{icon} {def.name}";
+                string tipBody = locked
+                    ? $"🔒 Se desbloquea en el nivel {def.level}."
+                    : $"Costo: {def.cost:N0} 🪙 · Nivel {def.level}" +
+                      (owned > 0 ? $"\nYa colocados: {owned}" : "") +
+                      (poor ? $"\n<color=#ff5252>Te faltan {def.cost - s.coins:N0} 🪙</color>" : "");
+                var img = row.GetComponent<Image>();
+                var hi = rowColor * 1.35f; hi.a = rowColor.a;
+                var trig = row.gameObject.AddComponent<EventTrigger>();
+                var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enter.callback.AddListener(_ => { img.color = hi; Tooltip.Show(tipTitle, tipBody); });
+                trig.triggers.Add(enter);
+                var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                exit.callback.AddListener(_ => { img.color = rowColor; Tooltip.Hide(); });
+                trig.triggers.Add(exit);
 
                 if (locked) continue;
 

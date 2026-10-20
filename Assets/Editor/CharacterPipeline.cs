@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.Build.Reporting;
@@ -58,19 +60,45 @@ namespace PuebloLoco.EditorTools
 
     public static class CharacterPipeline
     {
-        static readonly string[] Models = { "Villager", "Kid", "Elder", "SK_Sabio", "SK_Guardia", "SK_Merchant", "SK_Farmer", "samurai" };
+        const string CharactersDir = "Assets/Resources/Characters";
+
+        /// <summary>
+        /// Descubre solo los FBX de personaje (ignora .png de textura).
+        /// Se lee el directorio en vez de una lista fija para que todo
+        /// personaje generado por Studio 3Dy2D entre al pipeline sin tocar codigo.
+        /// </summary>
+        static string[] DiscoverModels()
+        {
+            if (!AssetDatabase.IsValidFolder(CharactersDir))
+                return new string[0];
+
+            return AssetDatabase.FindAssets("t:Model", new[] { CharactersDir })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(p => p.EndsWith(".fbx", StringComparison.OrdinalIgnoreCase))
+                .Select(p => Path.GetFileNameWithoutExtension(p))
+                .Distinct()
+                .OrderBy(n => n, StringComparer.Ordinal)
+                .ToArray();
+        }
 
         [MenuItem("Pueblo Loco/1. Importar personajes y crear Animators")]
         public static void BuildControllers()
         {
             AssetDatabase.Refresh();
 
+            var models = DiscoverModels();
+            if (models.Length == 0)
+            {
+                Debug.LogWarning("[CHARS] no se encontraron FBX en " + CharactersDir);
+                return;
+            }
+
             // forzar reimport para que el postprocessor aplique rig/clips
-            foreach (var m in Models)
+            foreach (var m in models)
                 AssetDatabase.ImportAsset("Assets/Resources/Characters/" + m + ".fbx", ImportAssetOptions.ForceUpdate);
 
             Directory.CreateDirectory("Assets/Resources/Animations");
-            foreach (var m in Models)
+            foreach (var m in models)
             {
                 string fbx = "Assets/Resources/Characters/" + m + ".fbx";
                 var clips = LoadClips(fbx);
