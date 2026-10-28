@@ -354,3 +354,7 @@ Arma un pueblo de ejemplo, deja a los vecinos animados y guarda 6 PNGs.
 - Juego original (web): [traderxael/pueblo-loco](https://github.com/traderxael/pueblo-loco)
 - Personajes, esqueletos y animaciones: generados con Blender 5.2.2 (script incluido)
 - Motor: Unity 6000.6.5f1
+
+## Licencia
+
+MIT. Ver [`LICENSE`](LICENSE).

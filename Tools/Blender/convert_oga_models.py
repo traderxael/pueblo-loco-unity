@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 """Convierte los .blend descargados de OpenGameArt a FBX para Unity."""
 import os
 import shutil
@@ -12,7 +14,7 @@ if HERE not in sys.path:
 
 import build_china_assets_v2 as v2  # noqa: E402
 
-DL = r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage_china_v2\downloads"
+DL = os.environ.get("PUEBLO_DOWNLOADS", str(Path(__file__).resolve().parents[2] / "_downloads"))
 OUT = v2.OUT
 
 FILES = [

@@ -1,4 +1,6 @@
-﻿"""
+import os
+from pathlib import Path
+"""
 PUEBLO LOCO â€” Assets temÃ¡ticos de la China antigua (Blender headless).
 
 Genera, a partir de las referencias de la presentaciÃ³n de Canva:
@@ -30,7 +32,8 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 import build_characters as bc  # noqa: E402
 
-STAGE = r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage_china"
+PROJECT = str(Path(__file__).resolve().parents[2])
+STAGE = os.environ.get("PUEBLO_STAGE_CHINA", str(Path(PROJECT) / "_stage_china"))
 OUT = os.path.join(STAGE, "assets")
 PREV = os.path.join(STAGE, "previews")
 

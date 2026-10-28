@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 """
 PUEBLO LOCO â€” Ciudad China Antigua (v2)
 Assets rediseÃ±ados siguiendo el prompt maestro (Tang/Ming, semi-estilizado).
@@ -29,7 +31,8 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 import build_characters as bc  # noqa: E402
 
-STAGE = r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage_china_v2"
+PROJECT = str(Path(__file__).resolve().parents[2])
+STAGE = os.environ.get("PUEBLO_STAGE_CHINA_V2", str(Path(PROJECT) / "_stage_china_v2"))
 OUT = os.path.join(STAGE, "assets")
 PREV = os.path.join(STAGE, "previews")
 

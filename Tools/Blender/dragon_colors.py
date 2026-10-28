@@ -1,7 +1,9 @@
+import os
+from pathlib import Path
 """Colores base de los materiales del dragon (para verificacion por pixeles)."""
 import bpy
 
-bpy.ops.wm.open_mainfile(filepath=r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage_china_v2\downloads\FantasyDragon_Animation_Free.blend")
+bpy.ops.wm.open_mainfile(filepath=os.environ.get("PUEBLO_DRAGON_BLEND", str(Path(__file__).resolve().parents[2] / "_downloads" / "FantasyDragon_Animation_Free.blend")))
 for m in bpy.data.materials:
     col = None
     if m.use_nodes:

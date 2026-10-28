@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 """
 PUEBLO LOCO - Generador de personajes animados (Blender headless)
 
@@ -30,8 +32,8 @@ from mathutils import Vector, Euler
 # ---------------------------------------------------------------------------
 # Blender corre con permisos restringidos: escribe en staging dentro del
 # workspace y luego sync_characters.ps1 copia los resultados al proyecto.
-PROJECT = r"C:\Users\USUARIO\proyectos\pueblo-loco-unity"
-STAGE = os.environ.get("PUEBLO_STAGE", r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage")
+PROJECT = str(Path(__file__).resolve().parents[2])
+STAGE = os.environ.get("PUEBLO_STAGE", str(Path(PROJECT) / "_stage"))
 OUT_DIR = os.path.join(STAGE, "characters")
 PREV_DIR = os.path.join(STAGE, "previews")
 

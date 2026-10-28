@@ -1,8 +1,10 @@
+import os
+from pathlib import Path
 """Inspecciona el FBX del samurai: huesos, acciones, bounds y materiales."""
 import bpy
 import os
 
-SRC = r"C:\Users\USUARIO\Documents\deepseek-harness\default-workspace\pueblo_stage_china_v2\downloads\samurai.fbx"
+SRC = os.environ.get("PUEBLO_SAMURAI_FBX", str(Path(__file__).resolve().parents[2] / "_downloads" / "samurai.fbx"))
 
 bpy.ops.wm.read_homefile(use_empty=True)
 # activar un objeto para que el importador no falle por contexto
